@@ -33,8 +33,8 @@ from micropython import const
 import adafruit_bus_device.i2c_device as i2c_device
 from adafruit_register.i2c_struct import ROUnaryStruct, UnaryStruct
 
-# from adafruit_register.i2c_bit import RWBit
-# from adafruit_register.i2c_bits import RWBits, ROBits
+from adafruit_register.i2c_bit import RWBit, ROBit
+from adafruit_register.i2c_bits import RWBits
 
 __version__ = "0.0.0-auto.0"
 __repo__ = "https:#github.com/adafruit/Adafruit_CircuitPython_TMP117.git"
@@ -69,6 +69,41 @@ class TMP117:
     _temp_high_limit = UnaryStruct(_T_HIGH_LIMIT, ">h")
     _temp_low_limit = UnaryStruct(_T_LOW_LIMIT, ">h")
     _raw_temperature_offset = UnaryStruct(_TEMP_OFFSET, ">h")
+
+    _high_alert_triggered = ROBit(_CONFIGURATION, 15, 2, False)
+    _low_alert_triggered = ROBit(_CONFIGURATION, 14, 2, False)
+    _data_ready = ROBit(_CONFIGURATION, 13, 2, False)
+    _eeprom_busy = ROBit(_CONFIGURATION, 12, 2, False)
+
+    _mode = RWBits(2, _CONFIGURATION, 10, 2, False)
+    """		00: Continuous conversion (CC)
+          01: Shutdown (SD)
+          10: Continuous conversion (CC), Same as 00 (reads back = 00)
+          11: One-shot conversion (OS)
+    """
+    _conversion_cycle = RWBits(3, _CONFIGURATION, 7, 2, False)
+    """
+    CONV[2:0]	AVG[1:0] = 00	AVG[1:0] = 01	AVG[1:0] = 10	AVG[1:0] = 11
+    0	1 5.5ms	  125ms	  500ms	1s
+    1	  125ms	  125ms	  500ms	1s
+    10	  250ms	  250ms	  500ms	1s
+    11	  500ms	  500ms	  500ms	1s
+    100	1s	1s	1s	1s
+    101	4s	4s	4s	4s
+    110	8s	8s	8s	8s
+    111	16s	16s	16s	16s
+    """
+    _averaging = RWBits(2, _CONFIGURATION, 5, 2, False)
+    """
+          00: No averaging
+          01: 8 Averaged conversions
+          10: 32 averaged conversions
+          11: 64 averaged conversions
+    """
+    _therm_mode_en = RWBit(_CONFIGURATION, 4, 2, False)
+    _int_active_high = RWBit(_CONFIGURATION, 3, 2, False)
+    _data_ready_int_en = RWBit(_CONFIGURATION, 2, 2, False)
+    _soft_reset = RWBit(_CONFIGURATION, 1, 2, False)
 
     def __init__(self, i2c_bus, address=_I2C_ADDR):
 
