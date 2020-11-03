@@ -27,7 +27,7 @@ Table of Contents
 .. toctree::
     :caption: Related Products
 
-* Adafruit {{cookiecutter.library_name}} Breakout <https://www.adafruit.com/product/PID_HERE>`_
+* Adafruit TMP117 Breakout <https://www.adafruit.com/product/PID_HERE>`_
 
 
 .. toctree::

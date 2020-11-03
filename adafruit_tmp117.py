@@ -18,15 +18,15 @@ Implementation Notes
 
 **Hardware:**
 
-* Adafruit TMP117 Breakout <https:#www.adafruit.com/product/PID_HERE>`_
+* `Adafruit TMP117 Breakout <https:#www.adafruit.com/product/PID_HERE>`_
 
 **Software and Dependencies:**
 
 * Adafruit CircuitPython firmware for the supported boards:
-  https:#github.com/adafruit/circuitpython/releases
+  https://github.com/adafruit/circuitpython/releases
 
-* Adafruit's Bus Device library: https:#github.com/adafruit/Adafruit_CircuitPython_BusDevice
-* Adafruit's Register library: https:#github.com/adafruit/Adafruit_CircuitPython_Register
+* Adafruit's Bus Device library https://github.com/adafruit/Adafruit_CircuitPython_BusDevice
+* Adafruit's Register library https://github.com/adafruit/Adafruit_CircuitPython_Register
 """
 
 import time
@@ -101,7 +101,7 @@ AverageCount.add_values(
 
 
 class MeasurementDelay(CV):
-    """Options for `data_rate`"""
+    """Options for `measurement_delay`"""
 
 
 MeasurementDelay.add_values(
@@ -250,7 +250,7 @@ class TMP117:
     def averaged_measurements(self):
         """The number of measurements that are taken and averaged before updating the temperature
         measurement register. A larger number will reduce measurement noise but may also affect
-        the rate at which measurements are updated, depending on the value of `conversion_cycle`
+        the rate at which measurements are updated, depending on the value of `measurement_delay`
 
         Note that each averaged measurement takes 15.5ms which means that larger numbers of averaged
         measurements may make the delay between new reported measurements to exceed the delay set

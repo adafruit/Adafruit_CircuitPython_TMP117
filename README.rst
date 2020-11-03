@@ -19,7 +19,6 @@ Introduction
 
 CircuitPython library for the TI TMP117 Temperature sensor
 
-
 Dependencies
 =============
 This driver depends on:

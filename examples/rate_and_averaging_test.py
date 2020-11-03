@@ -3,7 +3,8 @@
 # SPDX-License-Identifier: Unlicense
 # pylint:disable=no-member
 
-# This example is best viewed using a serial plotter such as the one built into the Mu editor.
+# This example is best viewed using a serial plotter
+# such as the one built into the Mu editor.
 import time
 import board
 import busio
@@ -11,6 +12,7 @@ from adafruit_tmp117 import TMP117, AverageCount, MeasurementDelay
 
 i2c = busio.I2C(board.SCL, board.SDA)
 tmp117 = TMP117(i2c)
+
 # uncomment different options below to see how it affects the reported temperature
 # tmp117.averaged_measurements = AverageCount.AVERAGE_1X
 # tmp117.averaged_measurements = AverageCount.AVERAGE_8X
@@ -40,10 +42,3 @@ print("")
 while True:
     print("Temperature:", tmp117.temperature)
     time.sleep(0.01)
-
-
-# 0b1000 1000 1000 0000
-# 0b1000 100 01 000 0000
-# 15 11 7
-
-# 00000 100 01 00000

@@ -6,3 +6,32 @@ Ensure your device works with this simple test.
 .. literalinclude:: ../examples/tmp117_simpletest.py
     :caption: examples/tmp117_simpletest.py
     :linenos:
+
+Temperature limits and alerts
+-----------------------------
+
+Set high and low temperature limits and be alerted when they are surpassed.
+
+.. literalinclude:: ../examples/limits_test.py
+    :caption: examples/limits_test.py
+    :linenos:
+
+Measurement averaging and rate
+------------------------------
+
+Adjust the number of samples averaged for every reported temperature, and adjust the time beween new
+measurement reports
+
+.. literalinclude:: ../examples/rate_and_averaging_test.py
+    :caption: examples/rate_and_averaging_test.py
+    :linenos:
+
+Temperature offset
+------------------
+
+Set an offset that will be applied to each measurement, to account for measurement biases in the
+sensor's environment
+
+.. literalinclude:: ../examples/offset_test.py
+    :caption: examples/offset_test.py
+    :linenos:
