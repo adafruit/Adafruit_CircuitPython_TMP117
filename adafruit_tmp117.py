@@ -65,6 +65,41 @@ _SHUTDOWN_MODE = 0b01  # Shutdown Conversion Mode
 AlertStatus = namedtuple("AlertStatus", ["high_alert", "low_alert"])
 
 
+class CV:
+    """struct helper"""
+
+    @classmethod
+    def add_values(cls, value_tuples):
+        """Add CV values to the class"""
+        cls.string = {}
+        cls.lsb = {}
+
+        for value_tuple in value_tuples:
+            name, value, string, lsb = value_tuple
+            setattr(cls, name, value)
+            cls.string[value] = string
+            cls.lsb[value] = lsb
+
+    @classmethod
+    def is_valid(cls, value):
+        """Validate that a given value is a member"""
+        return value in cls.string
+
+
+class AverageCount(CV):
+    """Options for `averaged_measurements`"""
+
+
+AverageCount.add_values(
+    (
+        ("AVERAGE_1X", 0b00, 1, None),
+        ("AVERAGE_8X", 0b01, 8, None),
+        ("AVERAGE_32X", 0b10, 32, None),
+        ("AVERAGE_64X", 0b11, 64, None),
+    )
+)
+
+
 class TMP117:
     """Library for the TI TMP117 high-accuracy temperature sensor"""
 
@@ -99,13 +134,8 @@ class TMP117:
     to report an average of eight conversions, then the active conversion time is 124 ms
     (15.5 ms × 8).
     """
-    _averaging = RWBits(2, _CONFIGURATION, 5, 2, False)
-    """
-          00: No averaging
-          01: 8 Averaged conversions
-          10: 32 averaged conversions
-          11: 64 averaged conversions
-    """
+    _raw_averaged_measurements = RWBits(2, _CONFIGURATION, 5, 2, False)
+
     _therm_mode_en = RWBit(_CONFIGURATION, 4, 2, False)
     _int_active_high = RWBit(_CONFIGURATION, 3, 2, False)
     _data_ready_int_en = RWBit(_CONFIGURATION, 2, 2, False)
@@ -211,3 +241,16 @@ class TMP117:
         data_ready = 0b001 & status_flags > 0
         self._data_ready = data_ready
         return AlertStatus(high_alert=high_alert, low_alert=low_alert)
+
+    @property
+    def averaged_measurements(self):
+        """The number of measurements that are taken and averaged before updating the temperature
+        measurement register. A larger number will reduce measurement noise but may also affect
+        the rate at which measurements are updated, depending on the value of `conversion_cycle`"""
+        return self._raw_averaged_measurements
+
+    @averaged_measurements.setter
+    def averaged_measurements(self, value):
+        if not AverageCount.is_valid(value):
+            raise AttributeError("averaged_measurements must be an `AverageCount`")
+        self._raw_averaged_measurements = value
