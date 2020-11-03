@@ -29,12 +29,14 @@ Implementation Notes
 * Adafruit's Register library: https:#github.com/adafruit/Adafruit_CircuitPython_Register
 """
 
+import time
+from collections import namedtuple
 from micropython import const
 import adafruit_bus_device.i2c_device as i2c_device
 from adafruit_register.i2c_struct import ROUnaryStruct, UnaryStruct
 
 from adafruit_register.i2c_bit import RWBit, ROBit
-from adafruit_register.i2c_bits import RWBits
+from adafruit_register.i2c_bits import RWBits, ROBits
 
 __version__ = "0.0.0-auto.0"
 __repo__ = "https:#github.com/adafruit/Adafruit_CircuitPython_TMP117.git"
@@ -60,21 +62,21 @@ _CONTINUOUS_CONVERSION_MODE = 0b00  # Continuous Conversion Mode
 _ONE_SHOT_MODE = 0b11  # One Shot Conversion Mode
 _SHUTDOWN_MODE = 0b01  # Shutdown Conversion Mode
 
+AlertStatus = namedtuple("AlertStatus", ["high_alert", "low_alert"])
+
 
 class TMP117:
     """Library for the TI TMP117 high-accuracy temperature sensor"""
 
     _part_id = ROUnaryStruct(_DEVICE_ID, ">H")
     _raw_temperature = ROUnaryStruct(_TEMP_RESULT, ">h")
-    _temp_high_limit = UnaryStruct(_T_HIGH_LIMIT, ">h")
-    _temp_low_limit = UnaryStruct(_T_LOW_LIMIT, ">h")
+    _raw_high_limit = UnaryStruct(_T_HIGH_LIMIT, ">h")
+    _raw_low_limit = UnaryStruct(_T_LOW_LIMIT, ">h")
     _raw_temperature_offset = UnaryStruct(_TEMP_OFFSET, ">h")
 
-    _high_alert_triggered = ROBit(_CONFIGURATION, 15, 2, False)
-    _low_alert_triggered = ROBit(_CONFIGURATION, 14, 2, False)
-    _data_ready = ROBit(_CONFIGURATION, 13, 2, False)
+    # these three bits will clear on read in some configurations, so we read them together
+    _alert_status_data_ready = ROBits(3, _CONFIGURATION, 13, 2, False)
     _eeprom_busy = ROBit(_CONFIGURATION, 12, 2, False)
-
     _mode = RWBits(2, _CONFIGURATION, 10, 2, False)
     """		00: Continuous conversion (CC)
           01: Shutdown (SD)
@@ -84,7 +86,7 @@ class TMP117:
     _conversion_cycle = RWBits(3, _CONFIGURATION, 7, 2, False)
     """
     CONV[2:0]	AVG[1:0] = 00	AVG[1:0] = 01	AVG[1:0] = 10	AVG[1:0] = 11
-    0	1 5.5ms	  125ms	  500ms	1s
+    0     15.5ms  125ms	  500ms	1s
     1	  125ms	  125ms	  500ms	1s
     10	  250ms	  250ms	  500ms	1s
     11	  500ms	  500ms	  500ms	1s
@@ -92,6 +94,10 @@ class TMP117:
     101	4s	4s	4s	4s
     110	8s	8s	8s	8s
     111	16s	16s	16s	16s
+
+    For example a single active conversion typically takes 15.5 ms, so if the device is configured
+    to report an average of eight conversions, then the active conversion time is 124 ms
+    (15.5 ms × 8).
     """
     _averaging = RWBits(2, _CONFIGURATION, 5, 2, False)
     """
@@ -110,6 +116,25 @@ class TMP117:
         self.i2c_device = i2c_device.I2CDevice(i2c_bus, address)
         if self._part_id != _DEVICE_ID_VALUE:
             raise AttributeError("Cannot find a TMP117")
+        # currently set when `alert_status` is read, but not exposed
+        self._data_ready = None
+        self.reset()
+        self.initialize()
+
+    def reset(self):
+        """Reset the sensor to its unconfigured power-on state"""
+        self._soft_reset = True
+
+    def initialize(self):
+        """Configure the sensor with sensible defaults. `initialize` is primarily provided to be
+        called after `reset`, however it can also be used to easily set the sensor to a known
+        configuration"""
+        # Datasheet specifies that reset will finish in 2ms however by default the first
+        # conversion will be averaged 8x and take 1s
+        # TODO: sleep depending on current averaging config
+        time.sleep(1)
+        self._data_ready = False
+        print("initialize")
 
     @property
     def temperature(self):
@@ -130,11 +155,59 @@ class TMP117:
 
     @property
     def high_limit(self):
-        """The high temperature limit. When the measure temperature exceeds this value TODO"""
-        return self._raw_high_limit
+        """The high temperature limit in degrees celcius. When the measured temperature exceeds this
+        value, the `high_alert` attribute of the `alert_status` property will be True. See the
+        documentation for `alert_status` for more information"""
+
+        return self._raw_high_limit * _TMP117_RESOLUTION
 
     @high_limit.setter
     def high_limit(self, value):
         if value > 256 or value < -256:
             raise AttributeError("high_limit must be from 255 to -256")
-        self._raw_high_limit = value
+        scaled_limit = int(value / _TMP117_RESOLUTION)
+        self._raw_high_limit = scaled_limit
+
+    @property
+    def low_limit(self):
+        """The low  temperature limit in degrees celcius. When the measured temperature goes below
+        this value, the `low_alert` attribute of the `alert_status` property will be True. See the
+        documentation for `alert_status` for more information"""
+
+        return self._raw_low_limit * _TMP117_RESOLUTION
+
+    @low_limit.setter
+    def low_limit(self, value):
+        if value > 256 or value < -256:
+            raise AttributeError("low_limit must be from 255 to -256")
+        scaled_limit = int(value / _TMP117_RESOLUTION)
+        self._raw_low_limit = scaled_limit
+
+    @property
+    def alert_status(self):
+        """The current triggered status of the high and low temperature alerts as a AlertStatus
+        named tuple with attributes for the triggered status of each alert.
+
+        .. code-block :: python3
+
+        import board
+        import busio
+        import adafruit_tmp117
+        i2c = busio.I2C(board.SCL, board.SDA)
+
+        tmp117 = adafruit_tmp117.TMP117(i2c)
+
+        tmp117.high_limit = 25
+        tmp117.low_limit = 10
+
+        """
+
+        # automatically cleared on read in alert mode. In therm mode it will stay set until
+        # the measured temp is below the hysteresis
+        status_flags = self._alert_status_data_ready
+        # 3 bits: high_alert, low_alert, data_ready
+        high_alert = 0b100 & status_flags > 0
+        low_alert = 0b010 & status_flags > 0
+        data_ready = 0b001 & status_flags > 0
+        self._data_ready = data_ready
+        return AlertStatus(high_alert=high_alert, low_alert=low_alert)
