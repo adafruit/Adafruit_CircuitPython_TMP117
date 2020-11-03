@@ -31,7 +31,7 @@ Implementation Notes
 
 from micropython import const
 import adafruit_bus_device.i2c_device as i2c_device
-from adafruit_register.i2c_struct import ROUnaryStruct
+from adafruit_register.i2c_struct import ROUnaryStruct, UnaryStruct
 
 # from adafruit_register.i2c_bit import RWBit
 # from adafruit_register.i2c_bits import RWBits, ROBits
@@ -66,6 +66,9 @@ class TMP117:
 
     _part_id = ROUnaryStruct(_DEVICE_ID, ">H")
     _raw_temperature = ROUnaryStruct(_TEMP_RESULT, ">h")
+    _temp_high_limit = UnaryStruct(_T_HIGH_LIMIT, ">h")
+    _temp_low_limit = UnaryStruct(_T_LOW_LIMIT, ">h")
+    _raw_temperature_offset = UnaryStruct(_TEMP_OFFSET, ">h")
 
     def __init__(self, i2c_bus, address=_I2C_ADDR):
 
@@ -77,3 +80,26 @@ class TMP117:
     def temperature(self):
         """The current measured temperature in degrees celcius"""
         return self._raw_temperature * _TMP117_RESOLUTION
+
+    @property
+    def temperature_offset(self):
+        """User defined temperature offset to be added to measurements from `temperature`"""
+        return self._raw_temperature_offset * _TMP117_RESOLUTION
+
+    @temperature_offset.setter
+    def temperature_offset(self, value):
+        if value > 256 or value < -256:
+            raise AttributeError("temperature_offset must be ")
+        scaled_offset = int(value / _TMP117_RESOLUTION)
+        self._raw_temperature_offset = scaled_offset
+
+    @property
+    def high_limit(self):
+        """The high temperature limit. When the measure temperature exceeds this value TODO"""
+        return self._raw_high_limit
+
+    @high_limit.setter
+    def high_limit(self, value):
+        if value > 256 or value < -256:
+            raise AttributeError("high_limit must be from 255 to -256")
+        self._raw_high_limit = value
