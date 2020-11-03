@@ -100,6 +100,24 @@ AverageCount.add_values(
 )
 
 
+class MeasurementDelay(CV):
+    """Options for `data_rate`"""
+
+
+MeasurementDelay.add_values(
+    (
+        ("DELAY_0_0015_S", 0b000, 0.00155, None),
+        ("DELAY_0_125_S", 0b01, 0.125, None),
+        ("DELAY_0_250_S", 0b010, 0.250, None),
+        ("DELAY_0_500_S", 0b011, 0.500, None),
+        ("DELAY_1_S", 0b100, 1, None),
+        ("DELAY_4_S", 0b101, 4, None),
+        ("DELAY_8_S", 0b110, 8, None),
+        ("DELAY_16_S", 0b111, 16, None),
+    )
+)
+
+
 class TMP117:
     """Library for the TI TMP117 high-accuracy temperature sensor"""
 
@@ -113,27 +131,14 @@ class TMP117:
     _alert_status_data_ready = ROBits(3, _CONFIGURATION, 13, 2, False)
     _eeprom_busy = ROBit(_CONFIGURATION, 12, 2, False)
     _mode = RWBits(2, _CONFIGURATION, 10, 2, False)
-    """		00: Continuous conversion (CC)
+    """
+          00: Continuous conversion (CC)
           01: Shutdown (SD)
           10: Continuous conversion (CC), Same as 00 (reads back = 00)
           11: One-shot conversion (OS)
     """
-    _conversion_cycle = RWBits(3, _CONFIGURATION, 7, 2, False)
-    """
-    CONV[2:0]	AVG[1:0] = 00	AVG[1:0] = 01	AVG[1:0] = 10	AVG[1:0] = 11
-    0     15.5ms  125ms	  500ms	1s
-    1	  125ms	  125ms	  500ms	1s
-    10	  250ms	  250ms	  500ms	1s
-    11	  500ms	  500ms	  500ms	1s
-    100	1s	1s	1s	1s
-    101	4s	4s	4s	4s
-    110	8s	8s	8s	8s
-    111	16s	16s	16s	16s
+    _raw_measurement_delay = RWBits(3, _CONFIGURATION, 7, 2, False)
 
-    For example a single active conversion typically takes 15.5 ms, so if the device is configured
-    to report an average of eight conversions, then the active conversion time is 124 ms
-    (15.5 ms × 8).
-    """
     _raw_averaged_measurements = RWBits(2, _CONFIGURATION, 5, 2, False)
 
     _therm_mode_en = RWBit(_CONFIGURATION, 4, 2, False)
@@ -164,7 +169,6 @@ class TMP117:
         # TODO: sleep depending on current averaging config
         time.sleep(1)
         self._data_ready = False
-        print("initialize")
 
     @property
     def temperature(self):
@@ -220,15 +224,15 @@ class TMP117:
 
         .. code-block :: python3
 
-        import board
-        import busio
-        import adafruit_tmp117
-        i2c = busio.I2C(board.SCL, board.SDA)
+            import board
+            import busio
+            import adafruit_tmp117
+            i2c = busio.I2C(board.SCL, board.SDA)
 
-        tmp117 = adafruit_tmp117.TMP117(i2c)
+            tmp117 = adafruit_tmp117.TMP117(i2c)
 
-        tmp117.high_limit = 25
-        tmp117.low_limit = 10
+            tmp117.high_limit = 25
+            tmp117.low_limit = 10
 
         """
 
@@ -246,7 +250,40 @@ class TMP117:
     def averaged_measurements(self):
         """The number of measurements that are taken and averaged before updating the temperature
         measurement register. A larger number will reduce measurement noise but may also affect
-        the rate at which measurements are updated, depending on the value of `conversion_cycle`"""
+        the rate at which measurements are updated, depending on the value of `conversion_cycle`
+
+        Note that each averaged measurement takes 15.5ms which means that larger numbers of averaged
+        measurements may make the delay between new reported measurements to exceed the delay set
+        by `measurement_delay`
+
+        .. code-block::python3
+
+            import time
+            import board
+            import busio
+            from adafruit_tmp117 import TMP117, AverageCount
+
+            i2c = busio.I2C(board.SCL, board.SDA)
+
+            tmp117 = TMP117(i2c)
+
+            # uncomment different options below to see how it affects the reported temperature
+            # tmp117.averaged_measurements = AverageCount.AVERAGE_1X
+            # tmp117.averaged_measurements = AverageCount.AVERAGE_8X
+            # tmp117.averaged_measurements = AverageCount.AVERAGE_32X
+            # tmp117.averaged_measurements = AverageCount.AVERAGE_64X
+
+            print(
+                "Number of averaged samples per measurement:",
+                AverageCount.string[tmp117.averaged_measurements],
+            )
+            print("")
+
+            while True:
+                print("Temperature:", tmp117.temperature)
+                time.sleep(0.1)
+
+        """
         return self._raw_averaged_measurements
 
     @averaged_measurements.setter
@@ -254,3 +291,54 @@ class TMP117:
         if not AverageCount.is_valid(value):
             raise AttributeError("averaged_measurements must be an `AverageCount`")
         self._raw_averaged_measurements = value
+
+    @property
+    def measurement_delay(self):
+        """The minimum amount of time between measurements in seconds. Must be a
+        `MeasurementDelay`. The specified amount may be exceeded depending on the
+        current setting off `averaged_measurements` which determines the minimum
+        time needed between reported measurements.
+
+        .. code-block::python3
+
+            import time
+            import board
+            import busio
+            from adafruit_tmp117 import TMP117, AverageCount, MeasurementDelay
+
+            i2c = busio.I2C(board.SCL, board.SDA)
+
+            tmp117 = TMP117(i2c)
+
+            # uncomment different options below to see how it affects the reported temperature
+
+            # tmp117.measurement_delay = MeasurementDelay.DELAY_0_0015_S
+            # tmp117.measurement_delay = MeasurementDelay.DELAY_0_125_S
+            # tmp117.measurement_delay = MeasurementDelay.DELAY_0_250_S
+            # tmp117.measurement_delay = MeasurementDelay.DELAY_0_500_S
+            # tmp117.measurement_delay = MeasurementDelay.DELAY_1_S
+            # tmp117.measurement_delay = MeasurementDelay.DELAY_4_S
+            # tmp117.measurement_delay = MeasurementDelay.DELAY_8_S
+            # tmp117.measurement_delay = MeasurementDelay.DELAY_16_S
+
+            print(
+                "Minimum time between measurements:",
+                MeasurementDelay.string[tmp117.measurement_delay],
+                "seconds"
+            )
+
+            print("")
+
+            while True:
+                print("Temperature:", tmp117.temperature)
+                time.sleep(0.01)
+
+        """
+
+        return self._raw_measurement_delay
+
+    @measurement_delay.setter
+    def measurement_delay(self, value):
+        if not MeasurementDelay.is_valid(value):
+            raise AttributeError("averaged_measurements must be a `MeasurementDelay`")
+        self._raw_measurement_delay = value

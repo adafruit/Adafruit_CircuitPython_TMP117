@@ -7,19 +7,43 @@
 import time
 import board
 import busio
-from adafruit_tmp117 import TMP117, AverageCount
+from adafruit_tmp117 import TMP117, AverageCount, MeasurementDelay
 
 i2c = busio.I2C(board.SCL, board.SDA)
-
 tmp117 = TMP117(i2c)
+# uncomment different options below to see how it affects the reported temperature
+# tmp117.averaged_measurements = AverageCount.AVERAGE_1X
+# tmp117.averaged_measurements = AverageCount.AVERAGE_8X
+# tmp117.averaged_measurements = AverageCount.AVERAGE_32X
+# tmp117.averaged_measurements = AverageCount.AVERAGE_64X
 
-tmp117.averaged_measurements = AverageCount.AVERAGE_1X
-tmp117.averaged_measurements = AverageCount.AVERAGE_32X
+# tmp117.measurement_delay = MeasurementDelay.DELAY_0_0015_S
+# tmp117.measurement_delay = MeasurementDelay.DELAY_0_125_S
+# tmp117.measurement_delay = MeasurementDelay.DELAY_0_250_S
+# tmp117.measurement_delay = MeasurementDelay.DELAY_0_500_S
+# tmp117.measurement_delay = MeasurementDelay.DELAY_1_S
+# tmp117.measurement_delay = MeasurementDelay.DELAY_4_S
+# tmp117.measurement_delay = MeasurementDelay.DELAY_8_S
+# tmp117.measurement_delay = MeasurementDelay.DELAY_16_S
+
 print(
     "Number of averaged samples per measurement:",
     AverageCount.string[tmp117.averaged_measurements],
 )
+print(
+    "Minimum time between measurements:",
+    MeasurementDelay.string[tmp117.measurement_delay],
+    "seconds",
+)
+print("")
 
 while True:
     print("Temperature:", tmp117.temperature)
     time.sleep(0.01)
+
+
+# 0b1000 1000 1000 0000
+# 0b1000 100 01 000 0000
+# 15 11 7
+
+# 00000 100 01 00000
