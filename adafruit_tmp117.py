@@ -131,14 +131,8 @@ class TMP117:
     _alert_status_data_ready = ROBits(3, _CONFIGURATION, 13, 2, False)
     _eeprom_busy = ROBit(_CONFIGURATION, 12, 2, False)
     _mode = RWBits(2, _CONFIGURATION, 10, 2, False)
-    """
-          00: Continuous conversion (CC)
-          01: Shutdown (SD)
-          10: Continuous conversion (CC), Same as 00 (reads back = 00)
-          11: One-shot conversion (OS)
-    """
-    _raw_measurement_delay = RWBits(3, _CONFIGURATION, 7, 2, False)
 
+    _raw_measurement_delay = RWBits(3, _CONFIGURATION, 7, 2, False)
     _raw_averaged_measurements = RWBits(2, _CONFIGURATION, 5, 2, False)
 
     _therm_mode_en = RWBit(_CONFIGURATION, 4, 2, False)
@@ -152,7 +146,6 @@ class TMP117:
         if self._part_id != _DEVICE_ID_VALUE:
             raise AttributeError("Cannot find a TMP117")
         # currently set when `alert_status` is read, but not exposed
-        self._data_ready = None
         self.reset()
         self.initialize()
 
@@ -167,13 +160,17 @@ class TMP117:
         # Datasheet specifies that reset will finish in 2ms however by default the first
         # conversion will be averaged 8x and take 1s
         # TODO: sleep depending on current averaging config
+        self._set_mode_and_wait_for_measurement(_CONTINUOUS_CONVERSION_MODE)  # one shot
         time.sleep(1)
-        self._data_ready = False
 
     @property
     def temperature(self):
         """The current measured temperature in degrees celcius"""
-        return self._raw_temperature * _TMP117_RESOLUTION
+
+        if self._mode == _SHUTDOWN_MODE:  # possibly after one-shot measurement
+            # set mode to continuous and wait for a measurement to complete
+            return self._set_mode_and_wait_for_measurement(_CONTINUOUS_CONVERSION_MODE)
+        return self._read_temperature()
 
     @property
     def temperature_offset(self):
@@ -235,15 +232,7 @@ class TMP117:
             tmp117.low_limit = 10
 
         """
-
-        # automatically cleared on read in alert mode. In therm mode it will stay set until
-        # the measured temp is below the hysteresis
-        status_flags = self._alert_status_data_ready
-        # 3 bits: high_alert, low_alert, data_ready
-        high_alert = 0b100 & status_flags > 0
-        low_alert = 0b010 & status_flags > 0
-        data_ready = 0b001 & status_flags > 0
-        self._data_ready = data_ready
+        high_alert, low_alert, *_ = self._read_status()
         return AlertStatus(high_alert=high_alert, low_alert=low_alert)
 
     @property
@@ -342,3 +331,43 @@ class TMP117:
         if not MeasurementDelay.is_valid(value):
             raise AttributeError("averaged_measurements must be a `MeasurementDelay`")
         self._raw_measurement_delay = value
+
+    def take_single_measurememt(self):
+        """Perform a single measurement cycle respecting the value of `averaged_measurements`,
+        returning the measurement once complete. Once finished the sensor is placed into a low power
+        state until `take_single_measurement` or `temperature` are read.
+
+        **Note:** if `averaged_measurements` is set to a high value there will be a notable
+        delay before the temperature measurement is returned while the sensor takes the required
+        number of measurements
+        """
+
+        return self._set_mode_and_wait_for_measurement(_ONE_SHOT_MODE)  # one shot
+
+    def _set_mode_and_wait_for_measurement(self, mode):
+
+        self._mode = mode
+        # poll for data ready
+        while not self._read_status()[2]:
+            time.sleep(0.001)
+
+        return self._read_temperature()
+
+    # alert mode vs therm mode:
+    # window alerts vs high limit with hysteresis
+
+    # eeprom write enable to set defaults for limits and config
+    # requires context manager or something to perform a general call reset
+
+    def _read_status(self):
+        # 3 bits: high_alert, low_alert, data_ready
+        status_flags = self._alert_status_data_ready
+
+        high_alert = 0b100 & status_flags > 0
+        low_alert = 0b010 & status_flags > 0
+        data_ready = 0b001 & status_flags > 0
+
+        return (high_alert, low_alert, data_ready)
+
+    def _read_temperature(self):
+        return self._raw_temperature * _TMP117_RESOLUTION
