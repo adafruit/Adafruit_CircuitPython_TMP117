@@ -119,11 +119,24 @@ MeasurementDelay.add_values(
 
 
 class AlertMode(CV):
-    """Options for `alert_mode`. See the documentation or `alert_mode` for more information."""
+    """Options for `alert_mode`. See `alert_mode` for more information."""
 
 
 AlertMode.add_values(
     (("WINDOW", 0, "Window", None), ("HYSTERESIS", 1, "Hysteresis", None))
+)
+
+
+class MeasurementMode(CV):
+    """Options for `measurement_mode`. See `measurement_mode` for more information."""
+
+
+MeasurementMode.add_values(
+    (
+        ("CONTINUOUS", 0, "Continuous", None),
+        ("ONE_SHOT", 2, "One shot", None),
+        ("SHUTDOWN", 1, "Shutdown", None),
+    )
 )
 
 
@@ -326,11 +339,11 @@ class TMP117:
 +----------------------------------------+------------------------------------------------------+
 
         """
-        return self._raw_measurement_mode
+        return self._mode
 
     @measurement_mode.setter
     def measurement_mode(self, value):
-        if not MeasurementMode.valid(value):
+        if not MeasurementMode.is_valid(value):
             raise AttributeError("measurement_mode must be a `MeasurementMode` ")
 
         self._set_mode_and_wait_for_measurement(value)
