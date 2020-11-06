@@ -193,7 +193,29 @@ class TMP117:
 
     @property
     def temperature_offset(self):
-        """User defined temperature offset to be added to measurements from `temperature`"""
+        """User defined temperature offset to be added to measurements from `temperature`
+
+        .. code-block::python3
+
+            # SPDX-FileCopyrightText: 2020 Bryan Siepert, written for Adafruit Industries
+            #
+            # SPDX-License-Identifier: Unlicense
+            import time
+            import board
+            import busio
+            import adafruit_tmp117
+
+            i2c = busio.I2C(board.SCL, board.SDA)
+
+            tmp117 = adafruit_tmp117.TMP117(i2c)
+
+            print("Temperature without offset: %.2f degrees C" % tmp117.temperature)
+            tmp117.temperature_offset = 10.0
+            while True:
+                print("Temperature w/ offset: %.2f degrees C" % tmp117.temperature)
+                time.sleep(1)
+
+        """
         return self._raw_temperature_offset * _TMP117_RESOLUTION
 
     @temperature_offset.setter
@@ -249,6 +271,24 @@ class TMP117:
 
             tmp117.high_limit = 25
             tmp117.low_limit = 10
+
+            print("High limit", tmp117.high_limit)
+            print("Low limit", tmp117.low_limit)
+
+            # Try changing `alert_mode`  to see how it modifies the behavior of the alerts.
+            # tmp117.alert_mode = AlertMode.WINDOW #default
+            # tmp117.alert_mode = AlertMode.HYSTERESIS
+
+            print("Alert mode:", AlertMode.string[tmp117.alert_mode])
+            print("")
+            print("")
+            while True:
+                print("Temperature: %.2f degrees C" % tmp117.temperature)
+                alert_status = tmp117.alert_status
+                print("High alert:", alert_status.high_alert)
+                print("Low alert:", alert_status.low_alert)
+                print("")
+                time.sleep(1)
 
         """
         high_alert, low_alert, *_ = self._read_status()
@@ -377,11 +417,8 @@ class TMP117:
             # tmp117.measurement_delay = MeasurementDelay.DELAY_8_S
             # tmp117.measurement_delay = MeasurementDelay.DELAY_16_S
 
-            print(
-                "Minimum time between measurements:",
-                MeasurementDelay.string[tmp117.measurement_delay],
-                "seconds"
-            )
+            print("Minimum time between measurements:",
+            MeasurementDelay.string[tmp117.measurement_delay], "seconds")
 
             print("")
 
@@ -412,7 +449,7 @@ class TMP117:
         return self._set_mode_and_wait_for_measurement(_ONE_SHOT_MODE)  # one shot
 
     @property
-    def alert_mode(self):   
+    def alert_mode(self):
         """Sets the behavior of the `low_limit`, `high_limit`, and `alert_status` properties.
 
         When set to :py:const:`AlertMode.WINDOW`, the `high_limit` property will unset when the
