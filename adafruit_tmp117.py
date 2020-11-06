@@ -412,7 +412,7 @@ class TMP117:
         return self._set_mode_and_wait_for_measurement(_ONE_SHOT_MODE)  # one shot
 
     @property
-    def alert_mode(self):
+    def alert_mode(self):   
         """Sets the behavior of the `low_limit`, `high_limit`, and `alert_status` properties.
 
         When set to :py:const:`AlertMode.WINDOW`, the `high_limit` property will unset when the
@@ -441,9 +441,6 @@ class TMP117:
             time.sleep(0.001)
 
         return self._read_temperature()
-
-    # alert mode vs therm mode:
-    # window alerts vs high limit with hysteresis
 
     # eeprom write enable to set defaults for limits and config
     # requires context manager or something to perform a general call reset
