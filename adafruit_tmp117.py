@@ -7,7 +7,7 @@
 
 CircuitPython library for the TI TMP117 Temperature sensor
 
-* Author(s): Bryan Siepert
+* Author(s): Bryan Siepert, Ian Grant
 
 parts based on SparkFun_TMP117_Arduino_Library by Madison Chodikov @ SparkFun Electronics:
 https://github.com/sparkfunX/Qwiic_TMP117
@@ -63,6 +63,18 @@ _ONE_SHOT_MODE = 0b11  # One Shot Conversion Mode
 _SHUTDOWN_MODE = 0b01  # Shutdown Conversion Mode
 
 AlertStatus = namedtuple("AlertStatus", ["high_alert", "low_alert"])
+
+
+def _convert_to_integer(bytes_to_convert):
+    """Use bitwise operators to convert the bytes into integers."""
+    integer = None
+    for chunk in bytes_to_convert:
+        if not integer:
+            integer = chunk
+        else:
+            integer = integer << 8
+            integer = integer | chunk
+    return integer
 
 
 class CV:
@@ -469,6 +481,36 @@ class TMP117:
         if not AlertMode.is_valid(value):
             raise AttributeError("alert_mode must be an `AlertMode`")
         self._raw_alert_mode = value
+
+
+    @property
+    def serial_number(self):
+        """
+        48-bit factory-set unique ID
+        See: https://e2e.ti.com/support/sensors/f/1023/t/815716?TMP117-Reading-Serial-Number-from-EEPROM
+        """
+        eeprom1_data = bytearray(2)
+        eeprom2_data = bytearray(2)
+        eeprom3_data = bytearray(2)
+        # Fetch EEPROM registers
+        with self.i2c_device as i2c:
+            i2c.write_then_readinto(bytearray([_EEPROM1]), eeprom1_data)
+            i2c.write_then_readinto(bytearray([_EEPROM2]), eeprom2_data)
+            i2c.write_then_readinto(bytearray([_EEPROM3]), eeprom3_data)
+        # Combine the 2-byte portions
+        combined_id = bytearray(
+            [
+                eeprom1_data[0],
+                eeprom1_data[1],
+                eeprom2_data[0],
+                eeprom2_data[1],
+                eeprom3_data[0],
+                eeprom3_data[1],
+            ]
+        )
+        # Convert to an integer
+        return _convert_to_integer(combined_id)
+
 
     def _set_mode_and_wait_for_measurement(self, mode):
 
