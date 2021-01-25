@@ -13,12 +13,15 @@ parts based on SparkFun_TMP117_Arduino_Library by Madison Chodikov @ SparkFun El
 https://github.com/sparkfunX/Qwiic_TMP117
 https://github.com/sparkfun/SparkFun_TMP117_Arduino_Library
 
+Serial number register information:
+https://e2e.ti.com/support/sensors/f/1023/t/815716?TMP117-Reading-Serial-Number-from-EEPROM
+
 Implementation Notes
 --------------------
 
 **Hardware:**
 
-* `Adafruit TMP117 Breakout <https:#www.adafruit.com/product/PID_HERE>`_
+* `Adafruit TMP117 Breakout <https:#www.adafruit.com/product/4821>`_
 
 **Software and Dependencies:**
 
@@ -485,10 +488,7 @@ class TMP117:
 
     @property
     def serial_number(self):
-        """
-        48-bit factory-set unique ID
-        See: https://e2e.ti.com/support/sensors/f/1023/t/815716?TMP117-Reading-Serial-Number-from-EEPROM
-        """
+        """A 48-bit, factory-set unique identifier for the device."""
         eeprom1_data = bytearray(2)
         eeprom2_data = bytearray(2)
         eeprom3_data = bytearray(2)
