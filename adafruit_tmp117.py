@@ -357,43 +357,45 @@ class TMP117:
 
     @property
     def measurement_mode(self):
+        # pylint: disable=line-too-long
         """Sets the measurement mode, specifying the behavior of how often measurements are taken.
-        `measurement_mode` must be one of:
+                `measurement_mode` must be one of:
 
-+----------------------------------------+------------------------------------------------------+
-| Mode                                   | Behavior                                             |
-+========================================+======================================================+
-| :py:const:`MeasurementMode.CONTINUOUS` | Measurements are made at the interval determined by  |
-|                                        |                                                      |
-|                                        | `averaged_measurements` and `measurement_delay`.     |
-|                                        |                                                      |
-|                                        | `temperature` returns the most recent measurement    |
-+----------------------------------------+------------------------------------------------------+
-| :py:const:`MeasurementMode.ONE_SHOT`   | Take a single measurement with the current number of |
-|                                        |                                                      |
-|                                        | `averaged_measurements` and switch to                |
-|                                        | :py:const:`SHUTDOWN` when                            |
-|                                        |                                                      |
-|                                        | finished.                                            |
-|                                        |                                                      |
-|                                        |                                                      |
-|                                        | `temperature` will return the new measurement until  |
-|                                        |                                                      |
-|                                        | `measurement_mode` is set to :py:const:`CONTINUOUS`  |
-|                                        | or :py:const:`ONE_SHOT` is                           |
-|                                        |                                                      |
-|                                        | set again.                                           |
-+----------------------------------------+------------------------------------------------------+
-| :py:const:`MeasurementMode.SHUTDOWN`   | The sensor is put into a low power state and no new  |
-|                                        |                                                      |
-|                                        | measurements are taken.                              |
-|                                        |                                                      |
-|                                        | `temperature` will return the last measurement until |
-|                                        |                                                      |
-|                                        | a new `measurement_mode` is selected.                |
-+----------------------------------------+------------------------------------------------------+
+        +----------------------------------------+------------------------------------------------------+
+        | Mode                                   | Behavior                                             |
+        +========================================+======================================================+
+        | :py:const:`MeasurementMode.CONTINUOUS` | Measurements are made at the interval determined by  |
+        |                                        |                                                      |
+        |                                        | `averaged_measurements` and `measurement_delay`.     |
+        |                                        |                                                      |
+        |                                        | `temperature` returns the most recent measurement    |
+        +----------------------------------------+------------------------------------------------------+
+        | :py:const:`MeasurementMode.ONE_SHOT`   | Take a single measurement with the current number of |
+        |                                        |                                                      |
+        |                                        | `averaged_measurements` and switch to                |
+        |                                        | :py:const:`SHUTDOWN` when                            |
+        |                                        |                                                      |
+        |                                        | finished.                                            |
+        |                                        |                                                      |
+        |                                        |                                                      |
+        |                                        | `temperature` will return the new measurement until  |
+        |                                        |                                                      |
+        |                                        | `measurement_mode` is set to :py:const:`CONTINUOUS`  |
+        |                                        | or :py:const:`ONE_SHOT` is                           |
+        |                                        |                                                      |
+        |                                        | set again.                                           |
+        +----------------------------------------+------------------------------------------------------+
+        | :py:const:`MeasurementMode.SHUTDOWN`   | The sensor is put into a low power state and no new  |
+        |                                        |                                                      |
+        |                                        | measurements are taken.                              |
+        |                                        |                                                      |
+        |                                        | `temperature` will return the last measurement until |
+        |                                        |                                                      |
+        |                                        | a new `measurement_mode` is selected.                |
+        +----------------------------------------+------------------------------------------------------+
 
         """
+        # pylint: enable=line-too-long
         return self._mode
 
     @measurement_mode.setter
@@ -485,7 +487,6 @@ class TMP117:
             raise AttributeError("alert_mode must be an `AlertMode`")
         self._raw_alert_mode = value
 
-
     @property
     def serial_number(self):
         """A 48-bit, factory-set unique identifier for the device."""
@@ -510,7 +511,6 @@ class TMP117:
         )
         # Convert to an integer
         return _convert_to_integer(combined_id)
-
 
     def _set_mode_and_wait_for_measurement(self, mode):
 
