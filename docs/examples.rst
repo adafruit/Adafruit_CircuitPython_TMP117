@@ -12,8 +12,8 @@ Temperature limits and alerts
 
 Set high and low temperature limits and be alerted when they are surpassed.
 
-.. literalinclude:: ../examples/limits_test.py
-    :caption: examples/limits_test.py
+.. literalinclude:: ../examples/tmp117_limits_test.py
+    :caption: examples/tmp117_limits_test.py
     :linenos:
 
 Measurement averaging and rate
@@ -22,8 +22,8 @@ Measurement averaging and rate
 Adjust the number of samples averaged for every reported temperature, and adjust the time beween new
 measurement reports
 
-.. literalinclude:: ../examples/rate_and_averaging_test.py
-    :caption: examples/rate_and_averaging_test.py
+.. literalinclude:: ../examples/tmp117_rate_and_averaging_test.py
+    :caption: examples/tmp117_rate_and_averaging_test.py
     :linenos:
 
 Temperature offset
@@ -32,6 +32,15 @@ Temperature offset
 Set an offset that will be applied to each measurement, to account for measurement biases in the
 sensor's environment
 
-.. literalinclude:: ../examples/offset_test.py
-    :caption: examples/offset_test.py
+.. literalinclude:: ../examples/tmp117_offset_test.py
+    :caption: examples/tmp117_offset_test.py
+    :linenos:
+
+Single Measurement Test
+-----------------------
+
+Take different sample number and average to give a single temperature measure
+
+.. literalinclude:: ../examples/tmp117_single_measurement_test.py
+    :caption: examples/tmp117_single_measurement_test.py
     :linenos:
