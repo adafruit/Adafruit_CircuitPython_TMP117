@@ -3,10 +3,9 @@
 # SPDX-License-Identifier: Unlicense
 import time
 import board
-import busio
 from adafruit_tmp117 import TMP117, AlertMode
 
-i2c = busio.I2C(board.SCL, board.SDA)
+i2c = board.I2C()  # uses board.SCL and board.SDA
 
 tmp117 = TMP117(i2c)
 

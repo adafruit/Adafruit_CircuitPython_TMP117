@@ -21,15 +21,20 @@ Implementation Notes
 
 **Hardware:**
 
-* `Adafruit TMP117 Breakout <https:#www.adafruit.com/product/4821>`_
+* `Adafruit TMP117 ±0.1°C High Accuracy I2C Temperature Sensor
+  <https://www.adafruit.com/product/4821>`_ (Product ID: 4821)
 
 **Software and Dependencies:**
 
 * Adafruit CircuitPython firmware for the supported boards:
-  https://github.com/adafruit/circuitpython/releases
+  https://circuitpython.org/downloads
 
-* Adafruit's Bus Device library https://github.com/adafruit/Adafruit_CircuitPython_BusDevice
-* Adafruit's Register library https://github.com/adafruit/Adafruit_CircuitPython_Register
+* Adafruit's Bus Device library:
+  https://github.com/adafruit/Adafruit_CircuitPython_BusDevice
+
+* Adafruit's Register library:
+  https://github.com/adafruit/Adafruit_CircuitPython_Register
+
 """
 
 import time
@@ -202,7 +207,7 @@ class TMP117:
 
     @property
     def temperature(self):
-        """The current measured temperature in degrees celcius"""
+        """The current measured temperature in degrees Celsius"""
 
         return self._read_temperature()
 
@@ -210,17 +215,13 @@ class TMP117:
     def temperature_offset(self):
         """User defined temperature offset to be added to measurements from `temperature`
 
-        .. code-block::python3
+        .. code-block::python
 
-            # SPDX-FileCopyrightText: 2020 Bryan Siepert, written for Adafruit Industries
-            #
-            # SPDX-License-Identifier: Unlicense
             import time
             import board
-            import busio
             import adafruit_tmp117
 
-            i2c = busio.I2C(board.SCL, board.SDA)
+            i2c = board.I2C()  # uses board.SCL and board.SDA
 
             tmp117 = adafruit_tmp117.TMP117(i2c)
 
@@ -242,7 +243,7 @@ class TMP117:
 
     @property
     def high_limit(self):
-        """The high temperature limit in degrees celcius. When the measured temperature exceeds this
+        """The high temperature limit in degrees Celsius. When the measured temperature exceeds this
         value, the `high_alert` attribute of the `alert_status` property will be True. See the
         documentation for `alert_status` for more information"""
 
@@ -257,7 +258,7 @@ class TMP117:
 
     @property
     def low_limit(self):
-        """The low  temperature limit in degrees celcius. When the measured temperature goes below
+        """The low  temperature limit in degrees Celsius. When the measured temperature goes below
         this value, the `low_alert` attribute of the `alert_status` property will be True. See the
         documentation for `alert_status` for more information"""
 
@@ -275,12 +276,11 @@ class TMP117:
         """The current triggered status of the high and low temperature alerts as a AlertStatus
         named tuple with attributes for the triggered status of each alert.
 
-        .. code-block :: python3
+        .. code-block :: python
 
             import board
-            import busio
             import adafruit_tmp117
-            i2c = busio.I2C(board.SCL, board.SDA)
+            i2c = board.I2C()  # uses board.SCL and board.SDA
 
             tmp117 = adafruit_tmp117.TMP117(i2c)
 
@@ -323,10 +323,9 @@ class TMP117:
 
             import time
             import board
-            import busio
             from adafruit_tmp117 import TMP117, AverageCount
 
-            i2c = busio.I2C(board.SCL, board.SDA)
+            i2c = board.I2C()  # uses board.SCL and board.SDA
 
             tmp117 = TMP117(i2c)
 
@@ -412,14 +411,13 @@ class TMP117:
         current setting off `averaged_measurements` which determines the minimum
         time needed between reported measurements.
 
-        .. code-block::python3
+        .. code-block::python
 
             import time
             import board
-            import busio
             from adafruit_tmp117 import TMP117, AverageCount, MeasurementDelay
 
-            i2c = busio.I2C(board.SCL, board.SDA)
+            ii2c = board.I2C()  # uses board.SCL and board.SDA
 
             tmp117 = TMP117(i2c)
 
