@@ -23,11 +23,12 @@ Table of Contents
 .. toctree::
     :caption: Tutorials
 
+    Adafruit TMP117 ±0.1°C High Accuracy I2C Temperature Sensor Learning Guide <https://learn.adafruit.com/adafruit-tmp117-high-accuracy-i2c-temperature-monitor>
 
 .. toctree::
     :caption: Related Products
 
-* Adafruit TMP117 Breakout <https://www.adafruit.com/product/PID_HERE>`_
+    Adafruit TMP117 ±0.1°C High Accuracy I2C Temperature Sensor <https://www.adafruit.com/product/4821>
 
 
 .. toctree::

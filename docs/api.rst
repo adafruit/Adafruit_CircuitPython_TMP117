@@ -6,3 +6,4 @@
 
 .. automodule:: adafruit_tmp117
    :members:
+   :exclude-members: CV
