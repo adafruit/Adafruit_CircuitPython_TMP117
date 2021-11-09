@@ -46,6 +46,12 @@ from adafruit_register.i2c_struct import ROUnaryStruct, UnaryStruct
 from adafruit_register.i2c_bit import RWBit, ROBit
 from adafruit_register.i2c_bits import RWBits, ROBits
 
+try:
+    from typing import Sequence, Tuple, Optional, Union
+    from busio import I2C
+except ImportError:
+    pass
+
 __version__ = "0.0.0-auto.0"
 __repo__ = "https:#github.com/adafruit/Adafruit_CircuitPython_TMP117.git"
 
@@ -73,7 +79,7 @@ _SHUTDOWN_MODE = 0b01  # Shutdown Conversion Mode
 AlertStatus = namedtuple("AlertStatus", ["high_alert", "low_alert"])
 
 
-def _convert_to_integer(bytes_to_convert):
+def _convert_to_integer(bytes_to_convert: bytearray) -> int:
     """Use bitwise operators to convert the bytes into integers."""
     integer = None
     for chunk in bytes_to_convert:
@@ -89,7 +95,7 @@ class CV:
     """struct helper"""
 
     @classmethod
-    def add_values(cls, value_tuples):
+    def add_values(cls, value_tuples: Sequence[Tuple[str, int, Union[int, str], Optional[int]]]):
         """Add CV values to the class"""
         cls.string = {}
         cls.lsb = {}
@@ -101,7 +107,7 @@ class CV:
             cls.lsb[value] = lsb
 
     @classmethod
-    def is_valid(cls, value):
+    def is_valid(cls, value: int) -> bool:
         """Validate that a given value is a member"""
         return value in cls.string
 
@@ -182,7 +188,7 @@ class TMP117:
     _data_ready_int_en = RWBit(_CONFIGURATION, 2, 2, False)
     _soft_reset = RWBit(_CONFIGURATION, 1, 2, False)
 
-    def __init__(self, i2c_bus, address=_I2C_ADDR):
+    def __init__(self, i2c_bus: I2C, address: int = _I2C_ADDR):
 
         self.i2c_device = i2c_device.I2CDevice(i2c_bus, address)
         if self._part_id != _DEVICE_ID_VALUE:
@@ -235,9 +241,8 @@ class TMP117:
         return self._raw_temperature_offset * _TMP117_RESOLUTION
 
     @temperature_offset.setter
-    def temperature_offset(self, value):
+    def temperature_offset(self, value: float):
         if value > 256 or value < -256:
-            raise AttributeError("temperature_offset must be ")
         scaled_offset = int(value / _TMP117_RESOLUTION)
         self._raw_temperature_offset = scaled_offset
 
@@ -250,7 +255,7 @@ class TMP117:
         return self._raw_high_limit * _TMP117_RESOLUTION
 
     @high_limit.setter
-    def high_limit(self, value):
+    def high_limit(self, value: float):
         if value > 256 or value < -256:
             raise AttributeError("high_limit must be from 255 to -256")
         scaled_limit = int(value / _TMP117_RESOLUTION)
@@ -265,7 +270,7 @@ class TMP117:
         return self._raw_low_limit * _TMP117_RESOLUTION
 
     @low_limit.setter
-    def low_limit(self, value):
+    def low_limit(self, value: float):
         if value > 256 or value < -256:
             raise AttributeError("low_limit must be from 255 to -256")
         scaled_limit = int(value / _TMP117_RESOLUTION)
@@ -349,7 +354,7 @@ class TMP117:
         return self._raw_averaged_measurements
 
     @averaged_measurements.setter
-    def averaged_measurements(self, value):
+    def averaged_measurements(self, value: int):
         if not AverageCount.is_valid(value):
             raise AttributeError("averaged_measurements must be an `AverageCount`")
         self._raw_averaged_measurements = value
@@ -398,7 +403,7 @@ class TMP117:
         return self._mode
 
     @measurement_mode.setter
-    def measurement_mode(self, value):
+    def measurement_mode(self, value: int):
         if not MeasurementMode.is_valid(value):
             raise AttributeError("measurement_mode must be a `MeasurementMode` ")
 
@@ -446,12 +451,12 @@ class TMP117:
         return self._raw_measurement_delay
 
     @measurement_delay.setter
-    def measurement_delay(self, value):
+    def measurement_delay(self, value: int):
         if not MeasurementDelay.is_valid(value):
             raise AttributeError("measurement_delay must be a `MeasurementDelay`")
         self._raw_measurement_delay = value
 
-    def take_single_measurememt(self):
+    def take_single_measurememt(self) -> float:
         """Perform a single measurement cycle respecting the value of `averaged_measurements`,
         returning the measurement once complete. Once finished the sensor is placed into a low power
         state until :py:meth:`take_single_measurement` or `temperature` are read.
@@ -480,7 +485,7 @@ class TMP117:
         return self._raw_alert_mode
 
     @alert_mode.setter
-    def alert_mode(self, value):
+    def alert_mode(self, value: int):
         if not AlertMode.is_valid(value):
             raise AttributeError("alert_mode must be an `AlertMode`")
         self._raw_alert_mode = value
@@ -510,7 +515,7 @@ class TMP117:
         # Convert to an integer
         return _convert_to_integer(combined_id)
 
-    def _set_mode_and_wait_for_measurement(self, mode):
+    def _set_mode_and_wait_for_measurement(self, mode: int) -> float:
 
         self._mode = mode
         # poll for data ready
@@ -522,7 +527,7 @@ class TMP117:
     # eeprom write enable to set defaults for limits and config
     # requires context manager or something to perform a general call reset
 
-    def _read_status(self):
+    def _read_status(self) -> Tuple[int, int, int]:
         # 3 bits: high_alert, low_alert, data_ready
         status_flags = self._alert_status_data_ready
 
@@ -532,5 +537,5 @@ class TMP117:
 
         return (high_alert, low_alert, data_ready)
 
-    def _read_temperature(self):
+    def _read_temperature(self) -> float:
         return self._raw_temperature * _TMP117_RESOLUTION
