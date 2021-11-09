@@ -95,7 +95,9 @@ class CV:
     """struct helper"""
 
     @classmethod
-    def add_values(cls, value_tuples: Sequence[Tuple[str, int, Union[int, str], Optional[int]]]):
+    def add_values(
+        cls, value_tuples: Sequence[Tuple[str, int, Union[int, str], Optional[int]]]
+    ):
         """Add CV values to the class"""
         cls.string = {}
         cls.lsb = {}
