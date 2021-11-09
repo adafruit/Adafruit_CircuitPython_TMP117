@@ -243,6 +243,7 @@ class TMP117:
     @temperature_offset.setter
     def temperature_offset(self, value: float):
         if value > 256 or value < -256:
+            raise AttributeError("temperature_offset must be from -256 to 256")
         scaled_offset = int(value / _TMP117_RESOLUTION)
         self._raw_temperature_offset = scaled_offset
 
