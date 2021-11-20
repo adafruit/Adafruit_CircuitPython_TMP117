@@ -459,7 +459,7 @@ class TMP117:
             raise AttributeError("measurement_delay must be a `MeasurementDelay`")
         self._raw_measurement_delay = value
 
-    def take_single_measurememt(self) -> float:
+    def take_single_measurement(self) -> float:
         """Perform a single measurement cycle respecting the value of `averaged_measurements`,
         returning the measurement once complete. Once finished the sensor is placed into a low power
         state until :py:meth:`take_single_measurement` or `temperature` are read.
