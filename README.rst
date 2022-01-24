@@ -2,7 +2,7 @@ Introduction
 ============
 
 .. image:: https://readthedocs.org/projects/adafruit-circuitpython-tmp117/badge/?version=latest
-    :target: https://circuitpython.readthedocs.io/projects/tmp117/en/latest/
+    :target: https://docs.circuitpython.org/projects/tmp117/en/latest/
     :alt: Documentation Status
 
 .. image:: https://img.shields.io/discord/327254708534116352.svg
@@ -75,7 +75,7 @@ Usage Example
 Documentation
 =============
 
-API documentation for this library can be found on `Read the Docs <https://circuitpython.readthedocs.io/projects/tmp117/en/latest/>`_.
+API documentation for this library can be found on `Read the Docs <https://docs.circuitpython.org/projects/tmp117/en/latest/>`_.
 
 Contributing
 ============
