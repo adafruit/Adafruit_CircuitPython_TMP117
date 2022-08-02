@@ -19,6 +19,8 @@ Introduction
 
 CircuitPython library for the TI TMP117 Temperature sensor
 
+WARNING: Library may not run on some boards with less RAM such as boards using the SAMD21
+
 Dependencies
 =============
 This driver depends on:
