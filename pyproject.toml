@@ -12,7 +12,7 @@ requires = [
 [project]
 name = "adafruit-circuitpython-tmp117"
 description = "CircuitPython library for the TI TMP117 Temperature sensor"
-version = "0.0.0-auto.0"
+version = "0.0.0+auto.0"
 readme = "README.rst"
 authors = [
     {name = "Adafruit Industries", email = "circuitpython@adafruit.com"}
