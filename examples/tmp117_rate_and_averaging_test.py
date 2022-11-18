@@ -10,6 +10,7 @@ import board
 from adafruit_tmp117 import TMP117, AverageCount, MeasurementDelay
 
 i2c = board.I2C()  # uses board.SCL and board.SDA
+# i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
 tmp117 = TMP117(i2c)
 
 # uncomment different options below to see how it affects the reported temperature
