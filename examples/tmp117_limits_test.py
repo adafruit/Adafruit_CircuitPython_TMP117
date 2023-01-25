@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: Unlicense
 import time
 import board
-from adafruit_tmp117 import TMP117, AlertMode
+from adafruit_tmp117 import TMP117
 
 i2c = board.I2C()  # uses board.SCL and board.SDA
 # i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
@@ -17,10 +17,10 @@ print("\nHigh limit", tmp117.high_limit)
 print("Low limit", tmp117.low_limit)
 
 # Try changing `alert_mode`  to see how it modifies the behavior of the alerts.
-# tmp117.alert_mode = AlertMode.WINDOW #default
-# tmp117.alert_mode = AlertMode.HYSTERESIS
+# tmp117.alert_mode = 0 # 0 WINDOW default
+tmp117.alert_mode = 1  # 1 HYSTERESIS
 
-print("Alert mode:", AlertMode.string[tmp117.alert_mode])
+print("Alert mode:", tmp117.alert_mode)
 print("\n\n")
 while True:
     print("Temperature: %.2f degrees C" % tmp117.temperature)

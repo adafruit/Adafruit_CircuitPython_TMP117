@@ -1,5 +1,5 @@
 # SPDX-FileCopyrightText: Copyright (c) 2020 Bryan Siepert for Adafruit Industries
-#
+# #
 # SPDX-License-Identifier: MIT
 """
 `adafruit_tmp117`
@@ -7,7 +7,7 @@
 
 CircuitPython library for the TI TMP117 Temperature sensor
 
-* Author(s): Bryan Siepert, Ian Grant
+* Author(s): Bryan Siepert, Ian Grant, Jose D. Montoya
 
 parts based on SparkFun_TMP117_Arduino_Library by Madison Chodikov @ SparkFun Electronics:
 https://github.com/sparkfunX/Qwiic_TMP117
@@ -42,12 +42,12 @@ from collections import namedtuple
 from micropython import const
 from adafruit_bus_device import i2c_device
 from adafruit_register.i2c_struct import ROUnaryStruct, UnaryStruct
-
 from adafruit_register.i2c_bit import RWBit, ROBit
 from adafruit_register.i2c_bits import RWBits, ROBits
 
 try:
     from typing import Sequence, Tuple, Optional, Union
+    from typing_extensions import Literal
     from busio import I2C
 except ImportError:
     pass
@@ -76,84 +76,10 @@ _CONTINUOUS_CONVERSION_MODE = const(0b00)  # Continuous Conversion Mode
 _ONE_SHOT_MODE = const(0b11)  # One Shot Conversion Mode
 _SHUTDOWN_MODE = const(0b01)  # Shutdown Conversion Mode
 
+ALERT_WINDOW = const(0)
+ALERT_HYSTERESIS = const(1)
+
 AlertStatus = namedtuple("AlertStatus", ["high_alert", "low_alert"])
-
-
-class CV:
-    """struct helper"""
-
-    @classmethod
-    def add_values(
-        cls, value_tuples: Sequence[Tuple[str, int, Union[int, str], Optional[int]]]
-    ):
-        """Add CV values to the class"""
-        cls.string = {}
-        cls.lsb = {}
-
-        for value_tuple in value_tuples:
-            name, value, string, lsb = value_tuple
-            setattr(cls, name, value)
-            cls.string[value] = string
-            cls.lsb[value] = lsb
-
-    @classmethod
-    def is_valid(cls, value: int) -> bool:
-        """Validate that a given value is a member"""
-        return value in cls.string
-
-
-class AverageCount(CV):
-    """Options for `averaged_measurements`"""
-
-
-AverageCount.add_values(
-    (
-        ("AVERAGE_1X", 0b00, 1, None),
-        ("AVERAGE_8X", 0b01, 8, None),
-        ("AVERAGE_32X", 0b10, 32, None),
-        ("AVERAGE_64X", 0b11, 64, None),
-    )
-)
-
-
-class MeasurementDelay(CV):
-    """Options for `measurement_delay`"""
-
-
-MeasurementDelay.add_values(
-    (
-        ("DELAY_0_0015_S", 0b000, 0.00155, None),
-        ("DELAY_0_125_S", 0b01, 0.125, None),
-        ("DELAY_0_250_S", 0b010, 0.250, None),
-        ("DELAY_0_500_S", 0b011, 0.500, None),
-        ("DELAY_1_S", 0b100, 1, None),
-        ("DELAY_4_S", 0b101, 4, None),
-        ("DELAY_8_S", 0b110, 8, None),
-        ("DELAY_16_S", 0b111, 16, None),
-    )
-)
-
-
-class AlertMode(CV):
-    """Options for `alert_mode`. See `alert_mode` for more information."""
-
-
-AlertMode.add_values(
-    (("WINDOW", 0, "Window", None), ("HYSTERESIS", 1, "Hysteresis", None))
-)
-
-
-class MeasurementMode(CV):
-    """Options for `measurement_mode`. See `measurement_mode` for more information."""
-
-
-MeasurementMode.add_values(
-    (
-        ("CONTINUOUS", 0, "Continuous", None),
-        ("ONE_SHOT", 2, "One shot", None),
-        ("SHUTDOWN", 1, "Shutdown", None),
-    )
-)
 
 
 class TMP117:
@@ -451,25 +377,33 @@ class TMP117:
         return self._set_mode_and_wait_for_measurement(_ONE_SHOT_MODE)  # one shot
 
     @property
-    def alert_mode(self):
+    def alert_mode(self) -> Literal[ALERT_WINDOW, ALERT_HYSTERESIS]:
         """Sets the behavior of the `low_limit`, `high_limit`, and `alert_status` properties.
 
-        When set to :py:const:`AlertMode.WINDOW`, the `high_limit` property will unset when the
+        When set to :py:const:`ALERT_WINDOW`, the `high_limit` property will unset when the
         measured temperature goes below `high_limit`. Similarly `low_limit` will be True or False
         depending on if the measured temperature is below (`False`) or above(`True`) `low_limit`.
 
-        When set to :py:const:`AlertMode.HYSTERESIS`, the `high_limit` property will be set to
+        When set to :py:const:`ALERT_HYSTERESIS`, the `high_limit` property will be set to
         `False` when the measured temperature goes below `low_limit`. In this mode, the `low_limit`
         property of `alert_status` will not be set.
 
-        The default is :py:const:`AlertMode.WINDOW`"""
+        The default is :py:const:`ALERT_WINDOW`"""
 
         return self._raw_alert_mode
 
     @alert_mode.setter
-    def alert_mode(self, value: int):
-        if not AlertMode.is_valid(value):
-            raise AttributeError("alert_mode must be an `AlertMode`")
+    def alert_mode(self, value: Literal[ALERT_WINDOW, ALERT_HYSTERESIS]):
+        """The alert_mode of the sensor
+
+        Could have the following values:
+
+        * ALERT_WINDOW
+        * ALERT_HYSTERESIS
+
+        """
+        if value not in [0, 1]:
+            raise ValueError("alert_mode must be an 0 or 1")
         self._raw_alert_mode = value
 
     @property
