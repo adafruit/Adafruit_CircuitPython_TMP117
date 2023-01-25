@@ -67,14 +67,14 @@ _EEPROM2 = const(0x06)
 _TEMP_OFFSET = const(0x07)
 _EEPROM3 = const(0x08)
 _DEVICE_ID = const(0x0F)
-_DEVICE_ID_VALUE = 0x0117
+_DEVICE_ID_VALUE = const(0x0117)
 _TMP117_RESOLUTION = (
     0.0078125  # Resolution of the device, found on (page 1 of datasheet)
 )
 
-_CONTINUOUS_CONVERSION_MODE = 0b00  # Continuous Conversion Mode
-_ONE_SHOT_MODE = 0b11  # One Shot Conversion Mode
-_SHUTDOWN_MODE = 0b01  # Shutdown Conversion Mode
+_CONTINUOUS_CONVERSION_MODE = const(0x00)  # 0b00 Continuous Conversion Mode
+_ONE_SHOT_MODE = const(0x03)  # 0b11 One Shot Conversion Mode
+_SHUTDOWN_MODE = const(0x01)  # 0b01  Shutdown Conversion Mode
 
 AlertStatus = namedtuple("AlertStatus", ["high_alert", "low_alert"])
 
