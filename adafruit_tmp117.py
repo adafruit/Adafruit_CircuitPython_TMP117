@@ -67,28 +67,16 @@ _EEPROM2 = const(0x06)
 _TEMP_OFFSET = const(0x07)
 _EEPROM3 = const(0x08)
 _DEVICE_ID = const(0x0F)
-_DEVICE_ID_VALUE = const(0x0117)
+_DEVICE_ID_VALUE = 0x0117
 _TMP117_RESOLUTION = (
     0.0078125  # Resolution of the device, found on (page 1 of datasheet)
 )
 
-_CONTINUOUS_CONVERSION_MODE = const(0x00)  # 0b00 Continuous Conversion Mode
-_ONE_SHOT_MODE = const(0x03)  # 0b11 One Shot Conversion Mode
-_SHUTDOWN_MODE = const(0x01)  # 0b01  Shutdown Conversion Mode
+_CONTINUOUS_CONVERSION_MODE = const(0b00)  # Continuous Conversion Mode
+_ONE_SHOT_MODE = const(0b11)  # One Shot Conversion Mode
+_SHUTDOWN_MODE = const(0b01)  # Shutdown Conversion Mode
 
 AlertStatus = namedtuple("AlertStatus", ["high_alert", "low_alert"])
-
-
-def _convert_to_integer(bytes_to_convert: bytearray) -> int:
-    """Use bitwise operators to convert the bytes into integers."""
-    integer = None
-    for chunk in bytes_to_convert:
-        if not integer:
-            integer = chunk
-        else:
-            integer = integer << 8
-            integer = integer | chunk
-    return integer
 
 
 class CV:
@@ -244,10 +232,7 @@ class TMP117:
 
     @temperature_offset.setter
     def temperature_offset(self, value: float):
-        if value > 256 or value < -256:
-            raise AttributeError("temperature_offset must be from -256 to 256")
-        scaled_offset = int(value / _TMP117_RESOLUTION)
-        self._raw_temperature_offset = scaled_offset
+        self._raw_temperature_offset = self._scaled_limit(value)
 
     @property
     def high_limit(self):
@@ -259,10 +244,7 @@ class TMP117:
 
     @high_limit.setter
     def high_limit(self, value: float):
-        if value > 256 or value < -256:
-            raise AttributeError("high_limit must be from 255 to -256")
-        scaled_limit = int(value / _TMP117_RESOLUTION)
-        self._raw_high_limit = scaled_limit
+        self._raw_high_limit = self._scaled_limit(value)
 
     @property
     def low_limit(self):
@@ -274,10 +256,7 @@ class TMP117:
 
     @low_limit.setter
     def low_limit(self, value: float):
-        if value > 256 or value < -256:
-            raise AttributeError("low_limit must be from 255 to -256")
-        scaled_limit = int(value / _TMP117_RESOLUTION)
-        self._raw_low_limit = scaled_limit
+        self._raw_low_limit = self._scaled_limit(value)
 
     @property
     def alert_status(self):
@@ -516,7 +495,7 @@ class TMP117:
             ]
         )
         # Convert to an integer
-        return _convert_to_integer(combined_id)
+        return combined_id
 
     def _set_mode_and_wait_for_measurement(self, mode: int) -> float:
 
@@ -542,3 +521,8 @@ class TMP117:
 
     def _read_temperature(self) -> float:
         return self._raw_temperature * _TMP117_RESOLUTION
+
+    def _scaled_limit(self, value: float) -> int:
+        if value > 256 or value < -256:
+            raise ValueError("value must be from 255 to -256")
+        return int(value / _TMP117_RESOLUTION)
