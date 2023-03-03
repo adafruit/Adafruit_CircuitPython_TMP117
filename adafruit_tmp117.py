@@ -162,7 +162,7 @@ class MeasurementMode(CV):
 MeasurementMode.add_values(
     (
         ("CONTINUOUS", 0, "Continuous", None),
-        ("ONE_SHOT", 2, "One shot", None),
+        ("ONE_SHOT", 3, "One shot", None),
         ("SHUTDOWN", 1, "Shutdown", None),
     )
 )
