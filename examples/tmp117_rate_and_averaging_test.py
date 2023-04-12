@@ -15,19 +15,6 @@ i2c = board.I2C()  # uses board.SCL and board.SDA
 tmp117 = adafruit_tmp117.TMP117(i2c)
 
 
-# Values here for the average_measurements and measurement_delay
-Delay_times = {
-    0: "DELAY_0_0015_S",
-    1: "DELAY_0_125_S",
-    2: "DELAY_0_250_S",
-    3: "DELAY_0_500_S",
-    4: "DELAY_1_S",
-    5: "DELAY_4_S",
-    6: "DELAY_8_S",
-    7: "DELAY_16_S",
-}
-Average_Measure = {1: "AVERAGE_1X", 2: "AVERAGE_8X", 3: "AVERAGE_32X", 4: "AVERAGE_64X"}
-
 # uncomment different options below to see how it affects the reported temperature
 # tmp117.averaged_measurements = adafruit_tmp117.AVERAGE_1X
 # tmp117.averaged_measurements = adafruit_tmp117.AVERAGE_8X
@@ -45,9 +32,9 @@ Average_Measure = {1: "AVERAGE_1X", 2: "AVERAGE_8X", 3: "AVERAGE_32X", 4: "AVERA
 
 print(
     "Number of averaged samples per measurement:",
-    Average_Measure[tmp117.averaged_measurements],
+    tmp117.averaged_measurements,
 )
-print("Minimum time between measurements:", Delay_times[tmp117.measurement_delay])
+print("Minimum time between measurements:", tmp117.measurement_delay)
 print("")
 
 while True:

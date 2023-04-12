@@ -260,17 +260,6 @@ class TMP117:
 
             tmp117 = adafruit_tmp117.TMP117(i2c)
 
-        In order to print information in a nicer way we create a dictionary with the
-        sensor information for the averaged measurements.
-
-        .. code-block::python3
-
-            Average_Measure = {1: "AVERAGE_1X", 2: "AVERAGE_8X", 3: "AVERAGE_32X", 4: "AVERAGE_64X"}
-
-        We print the information for the Temperature sensor
-
-        .. code-block::python3
-
             # uncomment different options below to see how it affects the reported temperature
             # tmp117.averaged_measurements = adafruit_tmp117.AVERAGE_1X
             # tmp117.averaged_measurements = adafruit_tmp117.AVERAGE_8X
@@ -279,7 +268,7 @@ class TMP117:
 
             print(
                 "Number of averaged samples per measurement:",
-                Average_Measure[tmp117.averaged_measurements],
+                tmp117.averaged_measurements,
             )
             print("")
 
@@ -288,7 +277,15 @@ class TMP117:
                 time.sleep(0.1)
 
         """
-        return self._raw_averaged_measurements
+
+        average_measure = {
+            1: "AVERAGE_1X",
+            2: "AVERAGE_8X",
+            3: "AVERAGE_32X",
+            4: "AVERAGE_64X",
+        }
+
+        return average_measure[self._raw_averaged_measurements]
 
     @averaged_measurements.setter
     def averaged_measurements(self, value: int):
@@ -360,25 +357,6 @@ class TMP117:
 
             tmp117 = adafruit_tmp117.TMP117(i2c)
 
-        In order to print information in a nicer way, we create a dictionary with the
-        sensor information for the measurement delay.
-
-        .. code-block::python3
-
-            Delay_times = {
-                0: "DELAY_0_0015_S",
-                1: "DELAY_0_125_S",
-                2: "DELAY_0_250_S",
-                3: "DELAY_0_500_S",
-                4: "DELAY_1_S",
-                5: "DELAY_4_S",
-                6: "DELAY_8_S",
-                7: "DELAY_16_S",
-            }
-
-        We print the information for the Temperature sensor
-
-        .. code-block::python3
 
             # uncomment different options below to see how it affects the reported temperature
 
@@ -392,7 +370,7 @@ class TMP117:
             # tmp117.measurement_delay = adafruit_tmp117.DELAY_16_S
 
             print("Minimum time between measurements:",
-            Delay_times[tmp117.measurement_delay])
+            tmp117.measurement_delay)
 
             print("")
 
@@ -402,7 +380,18 @@ class TMP117:
 
         """
 
-        return self._raw_measurement_delay
+        delay_times = {
+            0: "DELAY_0_0015_S",
+            1: "DELAY_0_125_S",
+            2: "DELAY_0_250_S",
+            3: "DELAY_0_500_S",
+            4: "DELAY_1_S",
+            5: "DELAY_4_S",
+            6: "DELAY_8_S",
+            7: "DELAY_16_S",
+        }
+
+        return delay_times[self._raw_measurement_delay]
 
     @measurement_delay.setter
     def measurement_delay(self, value: int) -> None:

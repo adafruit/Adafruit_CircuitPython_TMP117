@@ -21,7 +21,7 @@ Average_Measure = {1: "AVERAGE_1X", 2: "AVERAGE_8X", 3: "AVERAGE_32X", 4: "AVERA
 
 print(
     "Number of averaged samples per measurement:",
-    Average_Measure[tmp117.averaged_measurements],
+    tmp117.averaged_measurements,
 )
 
 while True:
