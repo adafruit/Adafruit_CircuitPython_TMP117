@@ -56,7 +56,6 @@ except ImportError:
 __version__ = "0.0.0+auto.0"
 __repo__ = "https:#github.com/adafruit/Adafruit_CircuitPython_TMP117.git"
 
-
 _I2C_ADDR = 0x48  # default I2C Address
 _TEMP_RESULT = const(0x00)
 _CONFIGURATION = const(0x01)
@@ -97,7 +96,6 @@ DELAY_16_S = const(0b111)  # 16
 MEASUREMENTMODE_CONTINUOUS = const(0b00)
 MEASUREMENTMODE_ONE_SHOT = const(0b11)
 MEASUREMENTMODE_SHUTDOWN = const(0b01)
-
 
 AlertStatus = namedtuple("AlertStatus", ["high_alert", "low_alert"])
 
