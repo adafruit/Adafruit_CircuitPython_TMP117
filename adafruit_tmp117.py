@@ -191,7 +191,6 @@ class TMP117:
     _soft_reset = RWBit(_CONFIGURATION, 1, 2, False)
 
     def __init__(self, i2c_bus: I2C, address: int = _I2C_ADDR):
-
         self.i2c_device = i2c_device.I2CDevice(i2c_bus, address)
         if self._part_id != _DEVICE_ID_VALUE:
             raise AttributeError("Cannot find a TMP117")
@@ -519,7 +518,6 @@ class TMP117:
         return _convert_to_integer(combined_id)
 
     def _set_mode_and_wait_for_measurement(self, mode: int) -> float:
-
         self._mode = mode
         # poll for data ready
         while not self._read_status()[2]:
