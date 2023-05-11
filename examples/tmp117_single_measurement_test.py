@@ -2,28 +2,26 @@
 #
 # SPDX-License-Identifier: Unlicense
 import board
-from adafruit_tmp117 import TMP117, AverageCount
+import adafruit_tmp117
 
 i2c = board.I2C()  # uses board.SCL and board.SDA
 # i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
-tmp117 = TMP117(i2c)
+tmp117 = adafruit_tmp117.TMP117(i2c)
+
+# Values here for the average_measurements
+Average_Measure = {1: "AVERAGE_1X", 2: "AVERAGE_8X", 3: "AVERAGE_32X", 4: "AVERAGE_64X"}
 
 # uncomment different options below to see how it affects the reported temperature
 # and measurement time
 
-# tmp117.averaged_measurements = AverageCount.AVERAGE_1X
-# tmp117.averaged_measurements = AverageCount.AVERAGE_8X
-# tmp117.averaged_measurements = AverageCount.AVERAGE_32X
-# tmp117.averaged_measurements = AverageCount.AVERAGE_64X
+# tmp117.averaged_measurements = adafruit_tmp117.AVERAGE_1X
+# tmp117.averaged_measurements = adafruit_tmp117.AVERAGE_8X
+# tmp117.averaged_measurements = adafruit_tmp117.AVERAGE_32X
+# tmp117.averaged_measurements = adafruit_tmp117.AVERAGE_64X
 
 print(
     "Number of averaged samples per measurement:",
-    AverageCount.string[tmp117.averaged_measurements],
-)
-print(
-    "Reads should take approximately",
-    AverageCount.string[tmp117.averaged_measurements] * 0.0155,
-    "seconds",
+    Average_Measure[tmp117.averaged_measurements],
 )
 
 while True:
