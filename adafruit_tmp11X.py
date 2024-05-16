@@ -2,10 +2,10 @@
 #
 # SPDX-License-Identifier: MIT
 """
-`adafruit_tmp117`
+`adafruit_tmp11X`
 ================================================================================
 
-CircuitPython library for the TI TMP117 Temperature sensor
+CircuitPython library for the TI TMP116,TMP117,TMP119 Temperature sensor
 
 * Author(s): Bryan Siepert, Ian Grant
 
@@ -53,7 +53,7 @@ except ImportError:
     pass
 
 __version__ = "0.0.0+auto.0"
-__repo__ = "https:#github.com/adafruit/Adafruit_CircuitPython_TMP117.git"
+__repo__ = "https://github.com/ami3go/Adafruit_CircuitPython_TMP11X.git"
 
 
 _I2C_ADDR = 0x48  # default I2C Address
@@ -67,7 +67,10 @@ _EEPROM2 = const(0x06)
 _TEMP_OFFSET = const(0x07)
 _EEPROM3 = const(0x08)
 _DEVICE_ID = const(0x0F)
-_DEVICE_ID_VALUE = 0x0117
+_TMP117_DEVICE_ID_VALUE = const(0x0117)
+_TMP116_DEVICE_ID_VALUE = const(0x1116)
+_TMP119_DEVICE_ID_VALUE = const(0x0117)
+
 _TMP117_RESOLUTION = (
     0.0078125  # Resolution of the device, found on (page 1 of datasheet)
 )
@@ -170,7 +173,6 @@ MeasurementMode.add_values(
 
 class TMP117:
     """Library for the TI TMP117 high-accuracy temperature sensor"""
-
     _part_id = ROUnaryStruct(_DEVICE_ID, ">H")
     _raw_temperature = ROUnaryStruct(_TEMP_RESULT, ">h")
     _raw_high_limit = UnaryStruct(_T_HIGH_LIMIT, ">h")
@@ -192,12 +194,16 @@ class TMP117:
 
     def __init__(self, i2c_bus: I2C, address: int = _I2C_ADDR):
         self.i2c_device = i2c_device.I2CDevice(i2c_bus, address)
-        if self._part_id != _DEVICE_ID_VALUE:
-            raise AttributeError("Cannot find a TMP117")
+        self._check_dev_id()
         # currently set when `alert_status` is read, but not exposed
         self.reset()
         self.initialize()
 
+    # thsi methods is unique for each device 
+    def _check_dev_id(self):
+        id = _TMP117_DEVICE_ID_VALUE
+        if self._part_id != id:
+            raise AttributeError("Cannot find a TMP117")
     def reset(self):
         """Reset the sensor to its unconfigured power-on state"""
         self._soft_reset = True
@@ -353,7 +359,7 @@ class TMP117:
                 time.sleep(0.1)
 
         """
-        return self._raw_averaged_measurements
+        return self._wait_for_measurement()
 
     @averaged_measurements.setter
     def averaged_measurements(self, value: int):
@@ -520,9 +526,11 @@ class TMP117:
     def _set_mode_and_wait_for_measurement(self, mode: int) -> float:
         self._mode = mode
         # poll for data ready
+        return self._wait_for_measurement()
+
+    def _wait_for_measurement(self)-> float:
         while not self._read_status()[2]:
             time.sleep(0.001)
-
         return self._read_temperature()
 
     # eeprom write enable to set defaults for limits and config
@@ -539,4 +547,15 @@ class TMP117:
         return (high_alert, low_alert, data_ready)
 
     def _read_temperature(self) -> float:
-        return self._raw_temperature * _TMP117_RESOLUTION
+        return round(self._raw_temperature * _TMP117_RESOLUTION, 3)
+
+class TMP119(TMP117):
+    def _check_dev_id(self):
+        id = _TMP119_DEVICE_ID_VALUE
+        if self._part_id != id:
+            raise AttributeError("Cannot find a TMP119")
+class TMP116(TMP117):
+    def _check_dev_id(self):
+        id = _TMP116_DEVICE_ID_VALUE
+        if self._part_id != id:
+            raise AttributeError("Cannot find a TMP116")

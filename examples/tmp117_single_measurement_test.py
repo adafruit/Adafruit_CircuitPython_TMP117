@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: Unlicense
 import board
-from adafruit_tmp117 import TMP117, AverageCount
+from adafruit_tmp11X import TMP117, AverageCount
 
 i2c = board.I2C()  # uses board.SCL and board.SDA
 # i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
