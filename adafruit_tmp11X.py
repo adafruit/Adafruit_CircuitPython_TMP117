@@ -199,7 +199,7 @@ class TMP117:
         self.reset()
         self.initialize()
 
-    # thsi methods is unique for each device 
+    # thsi methods is unique for each device
     def _check_dev_id(self):
         id = _TMP117_DEVICE_ID_VALUE
         if self._part_id != id:
@@ -223,6 +223,10 @@ class TMP117:
         """The current measured temperature in degrees Celsius"""
 
         return self._read_temperature()
+
+    @property
+    def temperature_updated(self):
+        return self._wait_for_measurement()
 
     @property
     def temperature_offset(self):
@@ -359,7 +363,7 @@ class TMP117:
                 time.sleep(0.1)
 
         """
-        return self._wait_for_measurement()
+        return self._raw_averaged_measurements
 
     @averaged_measurements.setter
     def averaged_measurements(self, value: int):
@@ -549,11 +553,13 @@ class TMP117:
     def _read_temperature(self) -> float:
         return round(self._raw_temperature * _TMP117_RESOLUTION, 3)
 
+
 class TMP119(TMP117):
     def _check_dev_id(self):
         id = _TMP119_DEVICE_ID_VALUE
         if self._part_id != id:
             raise AttributeError("Cannot find a TMP119")
+
 class TMP116(TMP117):
     def _check_dev_id(self):
         id = _TMP116_DEVICE_ID_VALUE
