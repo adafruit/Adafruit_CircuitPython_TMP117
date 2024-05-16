@@ -77,7 +77,7 @@ Usage Example
     # t2 = TMP117(i2c_bus=i2c, address=0x49)
     # t2 = TMP119(i2c_bus=i2c, address=0x49)
     while True:
-        print("Temperature:", tmp117.temperature)
+        print("Temperature:", t1.temperature)
         time.sleep(1)
 
 Documentation
