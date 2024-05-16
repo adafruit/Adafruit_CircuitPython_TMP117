@@ -45,13 +45,13 @@ PyPI <https://pypi.org/project/adafruit-circuitpython-tmp117/>`_. To install for
 
 .. code-block:: shell
 
-    pip3 install adafruit-circuitpython-tmp117
+    pip3 install git+https://github.com/ami3go/Adafruit_CircuitPython_TMP11X.git
 
 To install system-wide (this may be required in some cases):
 
 .. code-block:: shell
 
-    sudo pip3 install adafruit-circuitpython-tmp117
+    sudo pip3 install git+https://github.com/ami3go/Adafruit_CircuitPython_TMP11X.git
 
 To install in a virtual environment in your current project:
 
@@ -60,7 +60,7 @@ To install in a virtual environment in your current project:
     mkdir project-name && cd project-name
     python3 -m venv .venv
     source .venv/bin/activate
-    pip3 install adafruit-circuitpython-tmp117
+    pip3 install git+https://github.com/ami3go/Adafruit_CircuitPython_TMP11X.git
 
 Usage Example
 =============
@@ -70,10 +70,12 @@ Usage Example
     import time
     import board
     import adafruit_tmp11X
+    from adafruit_tmp11X import TMP117, TMP116, TMP119, AverageCount, MeasurementMode, MeasurementDelay
 
     i2c = board.I2C()  # uses board.SCL and board.SDA
-    tmp117 = adafruit_tmp11X.TMP117(i2c)
-
+    t1 = TMP116(i2c_bus=i2c, address=0x49)
+    # t2 = TMP117(i2c_bus=i2c, address=0x49)
+    # t2 = TMP119(i2c_bus=i2c, address=0x49)
     while True:
         print("Temperature:", tmp117.temperature)
         time.sleep(1)
