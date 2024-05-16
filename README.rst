@@ -65,13 +65,13 @@ Usage Example
 
     import time
     import board
-    import adafruit_tmp117
+    import adafruit_tmp11X
 
     i2c = board.I2C()  # uses board.SCL and board.SDA
-    tmp117 = adafruit_tmp117.TMP117(i2c)
+    tmp117 = adafruit_tmp11X.TMP117(i2c)
 
     while True:
-        print("Temperature: %.2f degrees C"%tmp117.temperature)
+        print("Temperature:", tmp117.temperature)
         time.sleep(1)
 
 Documentation
