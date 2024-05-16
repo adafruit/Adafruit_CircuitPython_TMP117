@@ -116,10 +116,12 @@ class CV:
         """Validate that a given value is a member"""
         return value in cls.string
 
-
 class AverageCount(CV):
     """Options for `averaged_measurements`"""
-
+    AVERAGE_1X = None
+    AVERAGE_8X = None
+    AVERAGE_32X = None
+    AVERAGE_64X = None
 
 AverageCount.add_values(
     (
@@ -131,9 +133,17 @@ AverageCount.add_values(
 )
 
 
+
 class MeasurementDelay(CV):
     """Options for `measurement_delay`"""
-
+    DELAY_0_0015_S = None
+    DELAY_0_125_S = None
+    DELAY_0_250_S = None
+    DELAY_0_500_S = None
+    DELAY_1_S = None
+    DELAY_4_S = None
+    DELAY_8_S = None
+    DELAY_16_S = None
 
 MeasurementDelay.add_values(
     (
@@ -151,16 +161,20 @@ MeasurementDelay.add_values(
 
 class AlertMode(CV):
     """Options for `alert_mode`. See `alert_mode` for more information."""
-
-
+    WINDOW = None
+    HYSTERESIS = None
 AlertMode.add_values(
-    (("WINDOW", 0, "Window", None), ("HYSTERESIS", 1, "Hysteresis", None))
+    (
+     ("WINDOW", 0, "Window", None),
+     ("HYSTERESIS", 1, "Hysteresis", None))
 )
 
 
 class MeasurementMode(CV):
     """Options for `measurement_mode`. See `measurement_mode` for more information."""
-
+    CONTINUOUS = None
+    ONE_SHOT = None
+    SHUTDOWN = None
 
 MeasurementMode.add_values(
     (
