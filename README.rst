@@ -17,8 +17,10 @@ Introduction
     :target: https://github.com/psf/black
     :alt: Code Style: Black
 
-CircuitPython library for the TI TMP116, TMP117, TMP119 Temperature sensor    
-It is forked from Adafruit_CircuitPython_TMP117, updated and extended to use it with TMP116 and TMP119    
+CircuitPython library for the TI TMP116, TMP117, TMP119 Temperature sensor
+
+It is forked from Adafruit_CircuitPython_TMP117, updated and extended to use it with TMP116 and TMP119
+
 All those sensor have common register map
 
 WARNING: Library may not run on some boards with less RAM such as boards using the SAMD21
