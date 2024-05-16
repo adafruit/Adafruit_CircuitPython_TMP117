@@ -15,12 +15,12 @@ tmp117 = TMP117(i2c)
 
 # uncomment different options below to see how it affects the reported temperature
 # tmp117.averaged_measurements = AverageCount.AVERAGE_1X
-# tmp117.averaged_measurements = AverageCount.AVERAGE_8X
+tmp117.averaged_measurements = AverageCount.AVERAGE_8X
 # tmp117.averaged_measurements = AverageCount.AVERAGE_32X
 # tmp117.averaged_measurements = AverageCount.AVERAGE_64X
 
 # tmp117.measurement_delay = MeasurementDelay.DELAY_0_0015_S
-# tmp117.measurement_delay = MeasurementDelay.DELAY_0_125_S
+tmp117.measurement_delay = MeasurementDelay.DELAY_0_125_S
 # tmp117.measurement_delay = MeasurementDelay.DELAY_0_250_S
 # tmp117.measurement_delay = MeasurementDelay.DELAY_0_500_S
 # tmp117.measurement_delay = MeasurementDelay.DELAY_1_S
