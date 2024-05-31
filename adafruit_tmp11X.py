@@ -183,6 +183,11 @@ MeasurementMode.add_values(
         ("SHUTDOWN", 1, "Shutdown", None),
     )
 )
+class Symbols:
+    deg = u'\N{DEGREE SIGN}'
+    degC = deg + "C"
+    degK = deg + "K"
+    degF = deg + "F"
 
 
 class TMP117:
@@ -212,6 +217,7 @@ class TMP117:
         # currently set when `alert_status` is read, but not exposed
         self.reset()
         self.initialize()
+
 
     # thsi methods is unique for each device
     def _check_dev_id(self):
