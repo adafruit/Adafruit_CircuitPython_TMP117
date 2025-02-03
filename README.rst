@@ -17,7 +17,11 @@ Introduction
     :target: https://github.com/psf/black
     :alt: Code Style: Black
 
-CircuitPython library for the TI TMP117 Temperature sensor
+CircuitPython library for the TI TMP116, TMP117, TMP119 Temperature sensor
+
+It is forked from Adafruit_CircuitPython_TMP117, updated and extended to use it with TMP116 and TMP119
+
+All those sensor have common register map
 
 WARNING: Library may not run on some boards with less RAM such as boards using the SAMD21
 
@@ -41,13 +45,13 @@ PyPI <https://pypi.org/project/adafruit-circuitpython-tmp117/>`_. To install for
 
 .. code-block:: shell
 
-    pip3 install adafruit-circuitpython-tmp117
+    pip3 install git+https://github.com/ami3go/Adafruit_CircuitPython_TMP11X.git
 
 To install system-wide (this may be required in some cases):
 
 .. code-block:: shell
 
-    sudo pip3 install adafruit-circuitpython-tmp117
+    sudo pip3 install git+https://github.com/ami3go/Adafruit_CircuitPython_TMP11X.git
 
 To install in a virtual environment in your current project:
 
@@ -56,7 +60,7 @@ To install in a virtual environment in your current project:
     mkdir project-name && cd project-name
     python3 -m venv .venv
     source .venv/bin/activate
-    pip3 install adafruit-circuitpython-tmp117
+    pip3 install git+https://github.com/ami3go/Adafruit_CircuitPython_TMP11X.git
 
 Usage Example
 =============
@@ -65,13 +69,15 @@ Usage Example
 
     import time
     import board
-    import adafruit_tmp117
+    import adafruit_tmp11X
+    from adafruit_tmp11X import TMP117, TMP116, TMP119, AverageCount, MeasurementMode, MeasurementDelay
 
     i2c = board.I2C()  # uses board.SCL and board.SDA
-    tmp117 = adafruit_tmp117.TMP117(i2c)
-
+    t1 = TMP116(i2c_bus=i2c, address=0x49)
+    # t2 = TMP117(i2c_bus=i2c, address=0x49)
+    # t2 = TMP119(i2c_bus=i2c, address=0x49)
     while True:
-        print("Temperature: %.2f degrees C"%tmp117.temperature)
+        print("Temperature:", t1.temperature)
         time.sleep(1)
 
 Documentation
