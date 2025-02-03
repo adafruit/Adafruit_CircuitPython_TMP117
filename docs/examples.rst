@@ -44,3 +44,12 @@ Take different sample number and average to give a single temperature measure
 .. literalinclude:: ../examples/tmp117_single_measurement_test.py
     :caption: examples/tmp117_single_measurement_test.py
     :linenos:
+
+DisplayIO Simpletest
+---------------------
+
+This is a simple test for boards with built-in display.
+
+.. literalinclude:: ../examples/tmp117_displayio_simpletest.py
+    :caption: examples/tmp117_displayio_simpletest.py
+    :linenos:
