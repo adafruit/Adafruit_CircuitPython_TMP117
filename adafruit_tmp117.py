@@ -39,15 +39,16 @@ Implementation Notes
 
 import time
 from collections import namedtuple
-from micropython import const
-from adafruit_bus_device import i2c_device
-from adafruit_register.i2c_struct import ROUnaryStruct, UnaryStruct
 
-from adafruit_register.i2c_bit import RWBit, ROBit
-from adafruit_register.i2c_bits import RWBits, ROBits
+from adafruit_bus_device import i2c_device
+from adafruit_register.i2c_bit import ROBit, RWBit
+from adafruit_register.i2c_bits import ROBits, RWBits
+from adafruit_register.i2c_struct import ROUnaryStruct, UnaryStruct
+from micropython import const
 
 try:
-    from typing import Sequence, Tuple, Optional, Union
+    from typing import Optional, Sequence, Tuple, Union
+
     from busio import I2C
 except ImportError:
     pass
@@ -68,9 +69,7 @@ _TEMP_OFFSET = const(0x07)
 _EEPROM3 = const(0x08)
 _DEVICE_ID = const(0x0F)
 _DEVICE_ID_VALUE = 0x0117
-_TMP117_RESOLUTION = (
-    0.0078125  # Resolution of the device, found on (page 1 of datasheet)
-)
+_TMP117_RESOLUTION = 0.0078125  # Resolution of the device, found on (page 1 of datasheet)
 
 _CONTINUOUS_CONVERSION_MODE = 0b00  # Continuous Conversion Mode
 _ONE_SHOT_MODE = 0b11  # One Shot Conversion Mode
@@ -95,9 +94,7 @@ class CV:
     """struct helper"""
 
     @classmethod
-    def add_values(
-        cls, value_tuples: Sequence[Tuple[str, int, Union[int, str], Optional[int]]]
-    ):
+    def add_values(cls, value_tuples: Sequence[Tuple[str, int, Union[int, str], Optional[int]]]):
         """Add CV values to the class"""
         cls.string = {}
         cls.lsb = {}
@@ -150,9 +147,7 @@ class AlertMode(CV):
     """Options for `alert_mode`. See `alert_mode` for more information."""
 
 
-AlertMode.add_values(
-    (("WINDOW", 0, "Window", None), ("HYSTERESIS", 1, "Hysteresis", None))
-)
+AlertMode.add_values((("WINDOW", 0, "Window", None), ("HYSTERESIS", 1, "Hysteresis", None)))
 
 
 class MeasurementMode(CV):
@@ -363,7 +358,6 @@ class TMP117:
 
     @property
     def measurement_mode(self):
-        # pylint: disable=line-too-long
         """Sets the measurement mode, specifying the behavior of how often measurements are taken.
                 `measurement_mode` must be one of:
 

@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: Unlicense
 import board
+
 from adafruit_tmp117 import TMP117, AverageCount
 
 i2c = board.I2C()  # uses board.SCL and board.SDA

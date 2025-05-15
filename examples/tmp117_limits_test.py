@@ -2,7 +2,9 @@
 #
 # SPDX-License-Identifier: Unlicense
 import time
+
 import board
+
 from adafruit_tmp117 import TMP117, AlertMode
 
 i2c = board.I2C()  # uses board.SCL and board.SDA
