@@ -6,7 +6,9 @@
 # This example is best viewed using a serial plotter
 # such as the one built into the Mu editor.
 import time
+
 import board
+
 from adafruit_tmp117 import TMP117, AverageCount, MeasurementDelay
 
 i2c = board.I2C()  # uses board.SCL and board.SDA
