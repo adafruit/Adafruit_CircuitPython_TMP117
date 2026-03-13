@@ -17,7 +17,7 @@ Introduction
     :target: https://github.com/astral-sh/ruff
     :alt: Code Style: Ruff
 
-CircuitPython library for the TI TMP117 Temperature sensor
+CircuitPython library for the TI TMP117 and TMP119 Temperature sensors
 
 WARNING: Library may not run on some boards with less RAM such as boards using the SAMD21
 

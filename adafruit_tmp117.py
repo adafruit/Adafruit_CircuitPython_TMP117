@@ -69,6 +69,7 @@ _TEMP_OFFSET = const(0x07)
 _EEPROM3 = const(0x08)
 _DEVICE_ID = const(0x0F)
 _DEVICE_ID_VALUE = 0x0117
+_TMP119_ID_VALUE = 0x2117
 _TMP117_RESOLUTION = 0.0078125  # Resolution of the device, found on (page 1 of datasheet)
 
 _CONTINUOUS_CONVERSION_MODE = 0b00  # Continuous Conversion Mode
@@ -187,8 +188,8 @@ class TMP117:
 
     def __init__(self, i2c_bus: I2C, address: int = _I2C_ADDR):
         self.i2c_device = i2c_device.I2CDevice(i2c_bus, address)
-        if self._part_id != _DEVICE_ID_VALUE:
-            raise AttributeError("Cannot find a TMP117")
+        if self._part_id not in {_DEVICE_ID_VALUE, _TMP119_ID_VALUE}:
+            raise AttributeError("Cannot find a TMP117 or TMP119")
         # currently set when `alert_status` is read, but not exposed
         self.reset()
         self.initialize()
@@ -418,7 +419,7 @@ class TMP117:
             import board
             from adafruit_tmp117 import TMP117, AverageCount, MeasurementDelay
 
-            ii2c = board.I2C()  # uses board.SCL and board.SDA
+            i2c = board.I2C()  # uses board.SCL and board.SDA
 
             tmp117 = TMP117(i2c)
 
