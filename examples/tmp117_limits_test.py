@@ -25,7 +25,7 @@ print("Low limit", tmp117.low_limit)
 print("Alert mode:", AlertMode.string[tmp117.alert_mode])
 print("\n\n")
 while True:
-    print("Temperature: %.2f degrees C" % tmp117.temperature)
+    print(f"Temperature: {tmp117.temperature:.2f} degrees C")
     alert_status = tmp117.alert_status
     print("High alert:", alert_status.high_alert)
     print("Low alert:", alert_status.low_alert)

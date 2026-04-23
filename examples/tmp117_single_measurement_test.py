@@ -28,5 +28,5 @@ print(
 )
 
 while True:
-    print("Single measurement: %.2f degrees C" % tmp117.take_single_measurement())
+    print(f"Single measurement: {tmp117.take_single_measurement():.2f} degrees C")
     # time.sleep(1)

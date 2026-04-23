@@ -12,8 +12,8 @@ i2c = board.I2C()  # uses board.SCL and board.SDA
 
 tmp117 = adafruit_tmp117.TMP117(i2c)
 
-print("Temperature without offset: %.2f degrees C" % tmp117.temperature)
+print(f"Temperature without offset: {tmp117.temperature:.2f} degrees C")
 tmp117.temperature_offset = 10.0
 while True:
-    print("Temperature w/ offset: %.2f degrees C" % tmp117.temperature)
+    print(f"Temperature w/ offset: {tmp117.temperature:.2f} degrees C")
     time.sleep(1)
